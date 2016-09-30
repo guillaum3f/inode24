@@ -1,0 +1,12 @@
+<form action="/" method="post">
+	First name:<br>
+	<input type="text" name="firstname" value="Mickey"><br>
+	Last name:<br>
+	<input type="text" name="lastname" value="Mouse"><br><br>
+	<input type="submit" value="Submit">
+</form>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js"></script>
+<script>
+var socket = io.connect('http://192.168.1.62:8087');
+</script>
