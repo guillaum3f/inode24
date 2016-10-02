@@ -5,7 +5,7 @@ module.exports = {
 		static : 'static'
 	},
 	network : {
-	  port : 9996
+	  port : 10101
   },
 	ident : {
 	  number : 204
@@ -20,14 +20,21 @@ module.exports = {
 	],
 	scripts : [
 		'main.js',
-		'auth.js'
+		'auth.js',
+		'login.js',
+		'register.js',
 	],
 	api : {
 		get : {
-			'/' : 'index.html'
+			'/' : 'index.html',
+			'/login' : 'login.html',
+			'/register' : 'register.html',
+			'/test' : 'test.html',
 		},
 		post : {
 			'/' : 'main.js',
+			'/login' : 'login.js',
+			'/register' : 'register.js',
 		}
   },
 }

@@ -10,8 +10,12 @@ var http = require('http');
 var express = require('express'),
 		    app = module.exports.app = express();
 
+process.argv.forEach(function (val, index, array) {
+      console.log('Arguments-'+index + ': ' + val);
+});
+
 //Require core libraries
-for (dep in config.deps) {
+for (var dep in config.deps) {
 	deps[config.deps[dep]] = require(config.deps[dep]);
 }
 
@@ -21,26 +25,30 @@ app.use(deps['body-parser'].urlencoded({ extended: false }));
 app.use(deps['express'].static(config.fs.static));
 
 //Require user scripts
-for (script in config.scripts) {
+for (var script in config.scripts) {
 	scripts[config.scripts[script]] = require(__dirname + '/' + config.fs.scripts+'/'+config.scripts[script]);
 }
 
 //Build GET router
-for (way in config.api['get']) {
-	  console.log('HTTP GET '+way);
-		app.get(way,function(req,res){
-			res.sendFile(__dirname + '/' + config.fs.pages + '/' + config.api['get'][way]);
-		});
+function makeGETHandler(way) {
+    return function(req, res) {
+        res.sendFile(__dirname + '/' + config.fs.pages + '/' + config.api['get'][way]);
+    };
+}
+for (var way in config.api['get']) {
+	console.log('HTTP GET '+way);
+    app.get(way,makeGETHandler(way));
 }
 
 //Build POST router
-for (route in config.api['post']) {
+function makePOSTHandler(route) {
+    return function(req, res) {
+        scripts[config.api['post'][route]](req,res);
+    };
+}
+for (var route in config.api['post']) {
 	  console.log('HTTP POST '+route);
-	  for (script in config.api['post'][route]) {
-		  app.post(route,function(req,res){
-			  scripts[config.api['post'][route]](req,res);
-		  });
-	  }
+      app.post(route,makePOSTHandler(route));
 }
 
 var server = http.createServer(app);
