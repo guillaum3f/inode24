@@ -1,12 +1,6 @@
-module.exports = function(req,res) {
+module.exports = function(req,res,next) {
 
-    var data = {};
 
-    //Get registration data
-    for (var item in req.body) {
-        data[item] = req.body[item];
-    }
-
-    res.send(data);
+    next();
 
 }
