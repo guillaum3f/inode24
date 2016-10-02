@@ -1,4 +1,4 @@
-<form action="/#awaiting" method="post">
+<form action="/register" method="post">
 
 <div class="form-group">
     <label for="email">Email address</label>
@@ -6,7 +6,17 @@
           <span class="input-group-btn">
               <button class="btn btn-default" type="button">Email</button>
           </span>
-          <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+          <input type="email" name="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="username">Username</label>
+    <div class="input-group">
+          <span class="input-group-btn">
+              <button class="btn btn-default" type="button">Username</button>
+          </span>
+          <input type="text" name="username" class="form-control" id="username" aria-describedby="usernameHelp" placeholder="Enter username">
     </div>
 </div>
 
@@ -17,7 +27,7 @@
               <button class="btn btn-default" ng-click="showpassword = !showpassword" type="button">Password</button>
           </span>
           <input id="password" class="form-control" placeholder="Password" ng-show="showpassword" type="text" ng-model="password">
-          <input id="password" class="form-control" placeholder="Password" ng-hide="showpassword" type="password" ng-model="password">
+          <input id="password" name="password" class="form-control" placeholder="Password" ng-hide="showpassword" type="password" ng-model="password">
           <div class="input-group-btn">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action <span class="caret"></span></button>
               <ul class="dropdown-menu dropdown-menu-right">
@@ -32,7 +42,7 @@
     </div><!-- /input-group -->
 </div>
 
-<button type="submit" action="/register" method="post" class="btn btn-default pull-right">Submit</button>
+<button type="submit" action="/register" method="post" class="btn btn-default pull-right">Register</button>
 
 </div>
 </form>

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cd .. && npm install && cd static && bower install && echo "done"

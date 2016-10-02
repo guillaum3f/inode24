@@ -26,10 +26,7 @@ module.exports = {
 	],
 	api : {
 		get : {
-			'/' : 'index.html',
-			'/login' : 'login.html',
-			'/register' : 'register.html',
-			'/test' : 'test.html',
+			'/' : 'index.html'
 		},
 		post : {
 			'/' : 'main.js',

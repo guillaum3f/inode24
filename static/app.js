@@ -5,7 +5,7 @@ angular.module('path', [
   'ngRoute'
 ]).
 config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
-  $routeProvider.when('/',{templateUrl: '/pages/search.html'});
+  $routeProvider.when('/',{templateUrl: '/pages/home.html'});
   $routeProvider.when('/register',{templateUrl: '/pages/register.html'});
   $routeProvider.when('/login',{templateUrl: '/pages/login.html'});
   $routeProvider.when('/awaiting',{templateUrl: '/pages/await.html'});
