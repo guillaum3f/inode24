@@ -8,8 +8,5 @@
     },
     "ident" : {
         "number" : "204"
-    },
-    "neighbourhood" : {
-        "authserv" : "192.168.1.62:3030"
     }
 }
