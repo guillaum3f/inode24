@@ -1,12 +1,11 @@
 {
     "fs" : {
-        "scripts" : "scripts",
-        "static" : "static"
+        "scripts" : "scripts"
     },
     "network" : {
-        "port" : "80"
+        "port" : "10101"
     },
     "ident" : {
-        "number" : "204"
+        "number" : "205"
     }
 }

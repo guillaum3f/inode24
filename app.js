@@ -36,13 +36,48 @@ fs.readdir(config.fs.scripts, function(err, items) {
 });
 
 //Optional
-app.use(deps['express'].static(config.fs.static)); //serve a static app
 require('./config/passport.js')(deps['passport']);
 app.use(deps['passport'].initialize()); //use passport
 
-//Frontend server
-var server = http.createServer(app); //serve user client
-var io = require('socket.io').listen(server);  //pass a http.Server instance
-server.listen(config.network.port);  //listen
-console.log('started '+config.network.port);
+// Create a simple server
+var server = net.createServer(function (conn) {
+    console.log("Backend: Client connected");
 
+    // If connection is closed
+    conn.on("end", function() {
+        console.log('Backend: Client disconnected');
+    });
+
+    // Handle data from client
+    conn.on("data", function(data) {
+        data = JSON.parse(data);
+
+        switch (data.scope) {
+            case 'register':
+                conn.write(
+                        JSON.stringify(
+                            { scope: data.scope, response: 'registration ok' }
+                            )
+                        );
+                break;
+
+            case 'login':
+                conn.write(
+                        JSON.stringify(
+                            { scope: data.scope, response: 'login ok' }
+                            )
+                        );
+                break;
+            
+            default:
+                break;
+        }
+
+    });
+
+});
+
+// Listen for connections
+server.listen(config.network.port, "localhost", function () {
+    console.log("Server: Listening at "+config.network.port);
+});
