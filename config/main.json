@@ -4,5 +4,10 @@
         "static" : "static"
     },
     "name" : "marvin",
-    "ident" : "24"
+    "ident" : "24",
+    "options" : {
+        "enable-static-content" : true,
+        "enable-centralized-ldapauth" : true,
+        "use-client-sessions" : true
+    }
 }
