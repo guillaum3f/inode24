@@ -1,6 +1,8 @@
 var http = require('http');
 var querystring = require('querystring');
 
+//This kind of scripts are not usable as a middleware in express
+//To use a script as a middleware it MUST take the following arguments : req, res, next
 module.exports = function (address,url,method,request,callback,errorHandler) {
 
         var data = '';
