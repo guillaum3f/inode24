@@ -1,9 +1,9 @@
+//You can require other scripts to work with
 var contact = require('./contact.js');
 
+//This kind of scripts are usable as a middleware in express
 module.exports = function (req, res, next) {
 
-    req.username = "toto2@toto2";
-    req.password = "carotte";
         contact('192.168.1.62:3030','/login','post',req,function(data) {
             res.send(data);
         }, function(error) {
