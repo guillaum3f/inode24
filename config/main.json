@@ -4,6 +4,8 @@
         "static" : "static"
     },
     "name" : "",
+    "scripts-at-boot" : {
+    },
     "options" : {
         "enable-static-content" : true,
         "enable-centralized-ldapauth" : true,

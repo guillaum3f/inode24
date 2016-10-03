@@ -63,15 +63,23 @@ if(config.global.address[config.name]) {
     }
     console.log('inode number '+config.ident);
 
-    //Start the Front server
-    deps['server'] = http.createServer(app); //serve user client
-    deps['socket.io'].listen(deps['server']);  //pass a http.Server instance
-    deps['server'].listen(port);  //listen
-    console.log('started '+port);
-
 } else {
     console.log('Error at boot, local config name "'+config.name+'" is not set in root config file (../config.json)');
     console.log('It should match one of theses hosts:'+Object.keys(config.global.address).map(function (key) { return ' '+key; }));
     console.log('Modify local config name adequatly (./config/main.json)');
+    return;
 }
+
+//Start scripts at boot if required
+for (var scr in config['scripts-at-boot']) {
+    require('./scripts/'+config['scripts-at-boot'][scr])();
+}
+return;
+
+//Start the Front server
+deps['server'] = http.createServer(app); //serve user client
+deps['socket.io'].listen(deps['server']);  //pass a http.Server instance
+deps['server'].listen(port);  //listen
+console.log('started '+port);
+
 
