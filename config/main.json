@@ -3,8 +3,7 @@
         "scripts" : "scripts",
         "static" : "static"
     },
-    "name" : "marvin",
-    "ident" : "24",
+    "name" : "authserv",
     "options" : {
         "enable-static-content" : true,
         "enable-centralized-ldapauth" : true,
