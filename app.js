@@ -2,6 +2,7 @@
 
 var http = require('http');
 var fs = require('fs');
+var net = require('net');
 
 //Extract arguments given to this script
 process.argv.forEach(function (val, index, array) {
@@ -12,7 +13,7 @@ process.argv.forEach(function (val, index, array) {
 });
 
 //Extract configuration
-var config = require('./config.json');
+var config = require('./config/main.json');
 
 //Require core libraries
 var deps = {};
@@ -22,7 +23,6 @@ for (var dep in require('./package.json').dependencies) {
 
 var app = deps['express']();
 app.use(deps['body-parser'].urlencoded({ extended: false }));
-//app.use(deps['express'].static(config.fs.static));
 
 //Require user scripts
 var scripts = {};
@@ -32,11 +32,16 @@ fs.readdir(config.fs.scripts, function(err, items) {
         scripts[items[i].substr(0,items[i].lastIndexOf("."))] = require(__dirname + '/' + config.fs.scripts+'/'+items[i]);
     }
     //Require routes
-    require('./routes.js')(app,scripts);
+    require('./routes.js')(app,deps,scripts);
 });
 
+//Optional
+app.use(deps['express'].static(config.fs.static)); //serve a static app
+require('./config/passport.js')(deps['passport']);
+app.use(deps['passport'].initialize()); //use passport
 
-var server = http.createServer(app);
+//Frontend server
+var server = http.createServer(app); //serve user client
 var io = require('socket.io').listen(server);  //pass a http.Server instance
 server.listen(config.network.port);  //listen
 console.log('started '+config.network.port);

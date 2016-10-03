@@ -13,6 +13,10 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "http-proxy": "^1.15.1",
+    "passport": "^0.3.2",
+    "passport-http": "^0.3.0",
+    "passport-ldapauth": "^0.6.0",
+    "passport-local": "^1.0.0",
     "querystring": "^0.2.0",
     "socket.io": "^1.4.8",
     "socket.io-router": "^0.3.0"

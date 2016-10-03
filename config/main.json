@@ -4,9 +4,12 @@
         "static" : "static"
     },
     "network" : {
-        "port" : "10101"
+        "port" : "80"
     },
     "ident" : {
         "number" : "204"
+    },
+    "neighbourhood" : {
+        "authserv" : "192.168.1.62:3030"
     }
 }
