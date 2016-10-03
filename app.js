@@ -15,6 +15,9 @@ process.argv.forEach(function (val, index, array) {
 //Extract configuration
 var config = require('./config/main.json');
 
+//Add global configuration
+config['global'] = require('../config.json');
+
 //Require core libraries
 var deps = {};
 for (var dep in require('./package.json').dependencies) {
@@ -24,19 +27,6 @@ for (var dep in require('./package.json').dependencies) {
 var app = deps['express']();
 app.use(deps['body-parser'].urlencoded({ extended: false }));
 
-// Create a socket (client) that connects to the server
-//var socket = {};
-//socket['backend'] = require('socket.io-client')('http://localhost:10101');
-//socket['backend'].on('connect',function() {
-//    console.log('Client has connected to the server!');
-//});
-//socket['backend'].on('message',function(data) {
-//    console.log('Received a message from the server!',data);
-//});
-//socket['backend'].on('disconnect',function() {
-//    console.log('Client has disconnected');
-//});
-
 //Require user scripts
 var scripts = {};
 fs.readdir(config.fs.scripts, function(err, items) {
@@ -45,7 +35,7 @@ fs.readdir(config.fs.scripts, function(err, items) {
         scripts[items[i].substr(0,items[i].lastIndexOf("."))] = require(__dirname + '/' + config.fs.scripts+'/'+items[i]);
     }
     //Require routes
-    require('./routes.js')(app,deps,scripts);
+    require('./routes.js')(app,config.global.address,scripts);
 });
 
 //Optional
@@ -54,8 +44,9 @@ require('./config/passport.js')(deps['passport']);
 app.use(deps['passport'].initialize()); //use passport
 
 //Frontend server
+var port = config.global.address[config.name].split(':')[1]
 deps['server'] = http.createServer(app); //serve user client
 deps['socket.io'].listen(deps['server']);  //pass a http.Server instance
-deps['server'].listen(config.network.port);  //listen
-console.log('started '+config.network.port);
+deps['server'].listen(port);  //listen
+console.log('started '+port);
 

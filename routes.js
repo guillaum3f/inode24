@@ -1,21 +1,18 @@
-module.exports = function(app,deps,scripts) {
-
-    //app.get('/', deps['passport'].authenticate('ldapauth'), function(req, res) {
-    app.get('/', function(req, res) {
-        res.send('Hello World!');
-    });
+module.exports = function(app,address,scripts) {
 
     app.post('/register', function(req, res) {
-
-        scripts.contact('localhost','10101','/register','post',req,function(data) {
+        scripts.contact(address.authserv,'/register','post',req,function(data) {
             res.send(data);
+        }, function(error) {
+            res.status(500).send('<h1>SORRY! </h1>Registration unavailable!');
         });
-
     });
 
     app.post('/login', function(req, res) {
-        scripts.contact('localhost','10101','/login','post',req,function(data) {
+        scripts.contact(address.authserv,'/login','post',req,function(data) {
             res.send(data);
+        }, function(error) {
+            res.status(500).send('<h1>SORRY! </h1>Login unavailable!');
         });
     });
 

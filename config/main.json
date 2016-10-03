@@ -3,10 +3,6 @@
         "scripts" : "scripts",
         "static" : "static"
     },
-    "network" : {
-        "port" : "80"
-    },
-    "ident" : {
-        "number" : "204"
-    }
+    "name" : "marvin",
+    "ident" : "24"
 }

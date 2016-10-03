@@ -1,16 +1,18 @@
 var http = require('http');
 var querystring = require('querystring');
 
-module.exports = function (host,port,url,method,request,callback) {
+module.exports = function (address,url,method,request,callback,errorHandler) {
 
         var data = '';
+
+        address = address.split(":");
 
         var post_data = querystring.stringify(request.body);
 
         // An object of options to indicate where to post to
         var post_options = {
-            host: host,
-            port: port,
+            host: address[0],
+            port: address[1],
             path: url,
             method: method,
         };
@@ -29,8 +31,13 @@ module.exports = function (host,port,url,method,request,callback) {
                 data += chunk;
             });
             res.on('end', function (chunk) {
-                callback(data);
+                if(callback)callback(data);
             });
+        });
+
+        post_req.on('error', function (error) {
+            if(errorHandler) errorHandler(error);
+            console.log('ERROR : '+error);
         });
 
         // post the data
