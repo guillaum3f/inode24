@@ -74,7 +74,6 @@ if(config.global.address[config.name]) {
 for (var scr in config['scripts-at-boot']) {
     require('./scripts/'+config['scripts-at-boot'][scr])();
 }
-return;
 
 //Start the Front server
 deps['server'] = http.createServer(app); //serve user client
