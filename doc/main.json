@@ -4,13 +4,12 @@
         "static" : "static",
         "sub-servers" : "subserv"
     },
-    "name" : "marvin",
+    "name" : "THIS-SERVICE-NAME-HERE",
     "run-subservers-at-boot" : {
-        "toto" : "ldapjs-serv"
     },
     "administration" : {
         "account" : "root",
-        "password" : "toto"
+        "password" : "root"
     },
     "options" : {
         "enable-static-content" : true,

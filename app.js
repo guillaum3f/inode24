@@ -70,9 +70,9 @@ if(config.global.address[config.name]) {
     return;
 }
 
-//Start scripts at boot if required
-for (var scr in config['scripts-at-boot']) {
-    require('./scripts/'+config['scripts-at-boot'][scr])();
+//Start sub-servers at boot if required in the local config file
+for (var server in config['run-subservers-at-boot']) {
+    require('./'+config.fs['sub-servers']+'/'+config['run-subservers-at-boot'][server])(config);
 }
 
 //Start the Front server
