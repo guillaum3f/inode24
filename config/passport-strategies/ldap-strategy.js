@@ -6,9 +6,7 @@ module.exports = function(passport) {
         search: {
             filter: '(&(l=Seattle)(email=*@foo.com))',
         }
-    },
-    function(profile, done) {
+    }, function(profile, done) {
         return done(null, profile);
-    }
-    ));
+    }));
 }
