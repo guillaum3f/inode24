@@ -1,3 +1,35 @@
 #!/bin/bash
 
-cd .. && npm install && mkdir scripts && mkdir static && mkdir subserv && cd static && bower install && echo "done"
+cd .. && 
+npm install && 
+
+[ ! -d scripts ] && mkdir scripts && 
+[ ! -d static ] && mkdir static && 
+[ ! -d subserv ] && mkdir subserv 
+
+read -p "Do you want to populate your service with a basic angularJS@1.5 app? " populate
+case "${populate}" in
+    [yY]|[oO]|"yes"|"YES")
+        cp -r doc/app-example/* static/ &&
+        cd static && bower install && cd .. 
+        ;; 
+esac
+unset populate
+
+read -p "Do you want to populate your scripts folder with some utils? " populate
+case "${populate}" in
+    [yY]|[oO]|"yes"|"YES")
+        cp -r doc/script-examples/* scripts/ 
+        ;; 
+esac
+unset populate
+
+read -p "Do you want to populate your subserv folder with an in-memory LDAPJS server made for example? " populate
+case "${populate}" in
+    [yY]|[oO]|"yes"|"YES")
+        cp -r doc/sub-servers/* subserv/ 
+        ;; 
+esac
+unset populate
+
+echo "done"
