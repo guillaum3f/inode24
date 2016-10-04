@@ -14,7 +14,12 @@
     },
     "options" : {
         "enable-static-content" : true,
-        "enable-centralized-ldapauth" : true,
+        "passport" : {
+            "use-passport" : true,
+            "passport-strategy" : [
+                "ldap-strategy"
+            ]
+        },
         "use-client-sessions" : true
     }
 }

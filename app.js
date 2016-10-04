@@ -40,8 +40,12 @@ fs.readdir(config.fs.scripts, function(err, items) {
 
 //Optional
 if(config.options['enable-static-content'] === true) app.use(deps['express'].static(config.fs.static)); //serve a static app
-if(config.options['enable-centralized-ldapauth'] === true) {
-    require('./config/passport-strategies/ldap-strategy.js')(deps['passport']);
+if(config.options.passport['use-passport'] === true) {
+    var strategy = config.options.passport['passport-strategy'];
+    if ( ! Array.isArray(strategy)) strategy = [strategy] 
+    for (var i=0; i<=strategy.length-1;i++) {
+        require('./config/passport-strategies/'+strategy[i])(deps['passport']);
+    }
     app.use(deps['passport'].initialize()); //use passport
 }
 if(config.options['use-client-sessions'] === true) {

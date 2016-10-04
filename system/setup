@@ -3,8 +3,8 @@
 cd .. && 
 npm install && 
 
-[ ! -d scripts ] && mkdir scripts && 
-[ ! -d static ] && mkdir static && 
+[ ! -d scripts ] && mkdir scripts 
+[ ! -d static ] && mkdir static 
 [ ! -d subserv ] && mkdir subserv 
 
 read -p "Do you want to populate your service with a basic angularJS@1.5 app? " populate
