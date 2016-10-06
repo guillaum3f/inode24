@@ -1,17 +1,7 @@
-# create ROLE level branches
+# create MEMBERS level branch
 
-dn: ou=ROLE0,ou=members,dc=DOMAIN,dc=TLD
+dn: ou=roles,dc=DOMAIN,dc=TLD
 objectclass: organizationalunit
-ou: ROLE0
-description: DOMAIN ROLE0
-
-dn: ou=ROLE1,ou=members,dc=DOMAIN,dc=TLD
-objectclass: organizationalunit
-ou: ROLE1
-description: DOMAIN ROLE1
-
-dn: ou=ROLE2,ou=members,dc=DOMAIN,dc=TLD
-objectclass: organizationalunit
-ou: ROLE2
-description: DOMAIN ROLE2
+ou: roles
+description: DOMAIN roles
 
