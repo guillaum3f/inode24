@@ -1,7 +1,10 @@
+var ldap = require('ldapjs');
+var fs = require('fs');
+var mkdirp = require('mkdirp');
+var exec = require('child_process').exec;
 
 module.exports = function(config) {
 
-var ldap = require('ldapjs');
     ///--- Shared handlers
 
     function authorize(req, res, next) {
@@ -16,14 +19,20 @@ var ldap = require('ldapjs');
 
     ///--- Globals
 
-    var SUFFIX = 'o='+config.global['service-name'];
+    var SUFFIX = 'dc='+config.global.TLD;
     var db = {};
     var server = ldap.createServer();
 
+    fs.stat(__dirname+'/data.json', function(err, stat) {
+        if(err == null) {
+            db = require(__dirname+'/data.json');
+        } else {
+            fs.writeFileSync(__dirname+'/data.json',JSON.stringify(db, null, 2));
+        }
+    });
 
-
-    server.bind('cn='+config.administration.account, function(req, res, next) {
-        if (req.dn.toString() !== 'cn='+config.administration.account || req.credentials !== config.administration.password)
+    server.bind('cn=root', function(req, res, next) {
+        if (req.dn.toString() !== 'cn=root' || req.credentials !== 'root')
             return next(new ldap.InvalidCredentialsError());
 
         res.end();
@@ -37,6 +46,10 @@ var ldap = require('ldapjs');
             return next(new ldap.EntryAlreadyExistsError(dn));
 
         db[dn] = req.toObject().attributes;
+
+        //Add save functionality
+        fs.writeFileSync(__dirname+'/data.json',JSON.stringify(db, null, 2));
+
         res.end();
         return next();
     });
@@ -83,6 +96,9 @@ var ldap = require('ldapjs');
             return next(new ldap.NoSuchObjectError(dn));
 
         delete db[dn];
+
+        //Add save functionality
+        fs.writeFileSync(__dirname+'/data.json',JSON.stringify(db, null, 2));
 
         res.end();
         return next();
@@ -133,6 +149,9 @@ var ldap = require('ldapjs');
                     break;
             }
         }
+
+        //Add save functionality
+        fs.writeFileSync(__dirname+'/data.json',JSON.stringify(db, null, 2));
 
         res.end();
         return next();
@@ -192,11 +211,33 @@ var ldap = require('ldapjs');
     });
 
 
-
     ///--- Fire it up
 
-    server.listen(1389, function() {
+    server.listen(config.custom['ldap-port'], function() {
+
         console.log('LDAP server up at: %s', server.url);
+
+        //Ensure LDIF folder exists
+        var LDIF = __dirname+'/LDIF';
+        mkdirp(LDIF, function(err) { 
+            // path exists unless there was an error
+            if(err) console.log(err);
+        });
+
+        var TMP = LDIF+'/'+'.history';
+        mkdirp(TMP, function(err) { 
+            // path exists unless there was an error
+            if(err) console.log(err);
+        });
+
+        //Merge every files in LDIF into one file
+        var tmp_file = TMP+'/'+Date.now().toString()+'.ldif';
+        exec('cat '+LDIF+'/*.ldif > '+tmp_file, function() {
+            exec('ldapadd -H ldap://127.0.0.1:'+config.custom["ldap-port"]+' -x -D cn=root -w root -f '+tmp_file, function() {
+                console.log('Database ready');
+            }); 
+        });
+        
     });
 
 }

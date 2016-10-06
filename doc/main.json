@@ -4,16 +4,22 @@
         "static" : "static",
         "sub-servers" : "subserv"
     },
-    "name" : "THIS-SERVICE-NAME-HERE",
+    "name" : "marvin",
     "run-subservers-at-boot" : {
+        "My LDAP Server" : "ldapjs-serv"
     },
     "administration" : {
         "account" : "root",
-        "password" : "root"
+        "password" : "j8pOjKJI6S$d"
     },
     "options" : {
         "enable-static-content" : true,
-        "enable-centralized-ldapauth" : true,
+        "passport" : {
+            "use-passport" : true,
+            "passport-strategy" : [
+                "ldap-strategy"
+            ]
+        },
         "use-client-sessions" : true
     }
 }

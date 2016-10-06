@@ -1,12 +1,19 @@
 var LDAPStrategy = require('passport-ldapauth');
-module.exports = function(passport) {
+
+module.exports = function(passport,config) {
+
     passport.use(new LDAPStrategy({
-        url: 'ldap://127.0.0.1:1389',
-        base: 'o=example',
-        search: {
-            filter: '(&(l=Seattle)(email=*@foo.com))',
-        }
-    }, function(profile, done) {
-        return done(null, profile);
+        server: {
+            url: 'ldap://127.0.0.1:'+config.custom['ldap-port'],
+            bindDn: 'cn='+config.administration.account,
+            bindCredentials: config.administration.password,
+            searchBase: 'ou=members, dc='+config.global.domain+', dc='+config.global.TLD,
+            searchFilter: '(cn={{username}})'
+        },
+        usernameField: 'email',
+        passwordField: 'password'
+    }, function(user, done) {
+        return done(null, user);
     }));
+
 }
