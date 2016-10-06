@@ -1,3 +1,5 @@
+const passport = require('passport');
+
 module.exports = function(app,config,scripts) {
 
     var address = config.global.address;
@@ -18,17 +20,16 @@ module.exports = function(app,config,scripts) {
         });
     });
 
-    const passport = require('passport');
-    app.post('/login', passport.authenticate('ldapauth', {session: false}), function(req, res) {
+    app.post('/login', scripts.retrieve_UID, passport.authenticate('ldapauth', {session: false}), function(req, res) {
         res.send('you are logged');
     });
 
     app.post('/register', function(req, res) {
         scripts.register(req, config, function(answer) {
             if(answer === true) {
-                res.send(req.body.email+' has been successfully registered. Welcome!');
+                res.end(req.body.email+' has been successfully registered. Welcome!');
             } else {
-                res.send('Sorry, '+req.body.email+' is not available');
+                res.end('Sorry, '+req.body.email+' is not available');
             }
         });
     });

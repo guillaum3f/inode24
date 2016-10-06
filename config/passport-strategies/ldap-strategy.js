@@ -8,9 +8,9 @@ module.exports = function(passport,config) {
             bindDn: 'cn='+config.administration.account,
             bindCredentials: config.administration.password,
             searchBase: 'ou=members, dc='+config.global.domain+', dc='+config.global.TLD,
-            searchFilter: '(cn={{username}})'
+            searchFilter: '(uid={{username}})'
         },
-        usernameField: 'email',
+        usernameField: 'uid',
         passwordField: 'password'
     }, function(user, done) {
         return done(null, user);
