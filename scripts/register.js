@@ -6,11 +6,11 @@ var ssha = require('node-ssha256');
 module.exports = function (req,config,callback) {
     
     var client = ldap.createClient({
-        url: 'ldap://127.0.0.1:1389'
+        url: 'ldap://127.0.0.1:'+config.custom['ldap-port']
     });
 
     //Bind as root to operate
-    client.bind('cn=root', 'root', function(err) {
+    client.bind('cn='+config.administration.account, config.administration.password, function(err) {
           assert.ifError(err);
     });
 

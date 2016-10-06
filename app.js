@@ -3,6 +3,8 @@
 var http = require('http');
 var fs = require('fs');
 var net = require('net');
+var path = require('path');
+var recursive = require('recursive-readdir');
 
 //Extract arguments given to this script
 process.argv.forEach(function (val, index, array) {
@@ -29,13 +31,15 @@ app.use(deps['body-parser'].urlencoded({ extended: false }));
 
 //Require user scripts
 var scripts = {};
-fs.readdir(config.fs.scripts, function(err, items) {
+recursive(config.fs.scripts, function(err, items) {
     if(err) throw err;
     for (var i=0; i<items.length; i++) {
-        scripts[items[i].substr(0,items[i].lastIndexOf("."))] = require(__dirname + '/' + config.fs.scripts+'/'+items[i]);
+        //scripts[items[i].substr(0,items[i].lastIndexOf("."))] = require(__dirname+'/' + config.fs.scripts+'/'+items[i]);
+        console.log('Loaded scripts : '+path.basename(items[i].substr(0,items[i].lastIndexOf(".")))+'.js');
+        scripts[path.basename(items[i].substr(0,items[i].lastIndexOf(".")))] = require(__dirname+'/' +items[i]);
     }
     //Require routes
-    require('./routes.js')(app,config,scripts);
+    require(__dirname+'/routes.js')(app,config,scripts);
 });
 
 //Optional
@@ -44,7 +48,7 @@ if(config.options.passport['use-passport'] === true) {
     var strategy = config.options.passport['passport-strategy'];
     if ( ! Array.isArray(strategy)) strategy = [strategy] 
     for (var i=0; i<=strategy.length-1;i++) {
-        require('./config/passport-strategies/'+strategy[i])(deps['passport'],config);
+        require(__dirname+'/scripts/passport-strategies/'+strategy[i])(deps['passport'],config);
     }
     app.use(deps['passport'].initialize()); //use passport
 }
