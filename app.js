@@ -3,7 +3,6 @@
 var http = require('http');
 var fs = require('fs');
 var net = require('net');
-var path = require('path');
 var recursive = require('recursive-readdir');
 
 //Extract arguments given to this script
@@ -33,10 +32,11 @@ app.use(deps['body-parser'].urlencoded({ extended: false }));
 var scripts = {};
 recursive(config.fs.scripts, function(err, items) {
     if(err) throw err;
+    var path;
     for (var i=0; i<items.length; i++) {
-        //scripts[items[i].substr(0,items[i].lastIndexOf("."))] = require(__dirname+'/' + config.fs.scripts+'/'+items[i]);
-        console.log('Loaded scripts : '+path.basename(items[i].substr(0,items[i].lastIndexOf(".")))+'.js');
-        scripts[path.basename(items[i].substr(0,items[i].lastIndexOf(".")))] = require(__dirname+'/' +items[i]);
+        path = items[i].substr(config.fs.scripts.length+1);
+        console.log('Loaded scripts : '+config.fs.scripts+'/'+path);
+        scripts[path.substr(0,path.lastIndexOf("."))] = require(__dirname+'/' +items[i]);
     }
     //Require routes
     require(__dirname+'/routes.js')(app,config,scripts);
