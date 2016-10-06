@@ -64,7 +64,7 @@ module.exports = function (req,config,callback) {
         callback(false);
     }
 
-    client.search('cn='+cn+', o=innov24', opts, function(err, res) {
+    client.search('cn='+cn+', ou=members, dc='+config.global.domain+', dc='+config.global.TLD, opts, function(err, res) {
         res.on('searchEntry', function(entry) {
             failure();
         });

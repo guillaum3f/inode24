@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cd ./system && ./setup && cd .. && node app.js
