@@ -7,24 +7,26 @@ npm install &&
 [ ! -d static ] && mkdir static 
 [ ! -d subserv ] && mkdir subserv 
 
-read -p "Do you want to populate your service with a basic angularJS@1.5 app? " populate
+populate="yes"
+
+#read -p "Do you want to populate your service with a basic angularJS@1.5 app? " populate
 case "${populate}" in
     [yY]|[oO]|"yes"|"YES")
         cp -r doc/app-example/* static/ &&
         cd static && bower install && cd .. 
         ;; 
 esac
-unset populate
+#unset populate
 
-read -p "Do you want to populate your scripts folder with some utils? " populate
+#read -p "Do you want to populate your scripts folder with some utils? " populate
 case "${populate}" in
     [yY]|[oO]|"yes"|"YES")
         cp -r doc/script-examples/* scripts/ 
         ;; 
 esac
-unset populate
+#unset populate
 
-read -p "Do you want to populate your subserv folder with an in-memory LDAPJS server made for example? " populate
+#read -p "Do you want to populate your subserv folder with an in-memory LDAPJS server made for example? " populate
 case "${populate}" in
     [yY]|[oO]|"yes"|"YES")
 
