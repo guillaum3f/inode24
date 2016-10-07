@@ -1,3 +1,9 @@
 #!/bin/bash
 
-cd ./system && ./setup && cd .. && node app.js
+read -p "Prez mode? [y/n] " prez
+if [ $prez = "y" ]; then
+    git checkout prez
+    echo "re-run"
+else
+    cd ./system && ./setup && cd .. && node app.js
+fi
