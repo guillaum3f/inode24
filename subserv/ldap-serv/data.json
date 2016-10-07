@@ -71,7 +71,8 @@
       "uid=42f12996-4da8-c6d0-2fdf-818fbd1a0886, ou=members, dc=innov24, dc=io",
       "uid=fa332e44-ae05-7092-78a6-9b82b30fc467, ou=members, dc=innov24, dc=io",
       "uid=7601dcda-ff24-7e7f-d78b-1fb444de14c3, ou=members, dc=innov24, dc=io",
-      "cn=p@p, ou=members, dc=innov24, dc=io"
+      "cn=p@p, ou=members, dc=innov24, dc=io",
+      "cn=vik@vik, ou=members, dc=innov24, dc=io"
     ]
   },
   "cn=leader, ou=roles, dc=innov24, dc=io": {
@@ -352,6 +353,23 @@
     ],
     "mail": [
       "p@p"
+    ],
+    "objectclass": [
+      "inetOrgPerson"
+    ],
+    "sn": [
+      "toto"
+    ],
+    "userpassword": [
+      "toto"
+    ]
+  },
+  "cn=vik@vik, ou=members, dc=innov24, dc=io": {
+    "cn": [
+      "vik@vik"
+    ],
+    "mail": [
+      "vik@vik"
     ],
     "objectclass": [
       "inetOrgPerson"
