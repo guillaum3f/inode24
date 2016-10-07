@@ -64,4 +64,9 @@ case "${populate}" in
 esac
 unset populate
 
+echo "Because Git sucks...."
+cd subserv/app-serv/apps/member/app/vendor && git clone https://github.com/FortAwesome/Font-Awesome.git && 
+git clone https://github.com/BlackrockDigital/startbootstrap-simple-sidebar.git 
+cd ../../ && bower install
+
 echo "done"

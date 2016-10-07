@@ -1,16 +1,15 @@
 var ldap = require('ldapjs');
 var assert = require('assert');
-var Guid = require('guid');
 var ssha = require('node-ssha256');
 
 module.exports = function (req,config,callback) {
     
     var client = ldap.createClient({
-        url: 'ldap://127.0.0.1:'+config.custom['ldap-port']
+        url: 'ldap://127.0.0.1:1389'
     });
 
     //Bind as root to operate
-    client.bind('cn='+config.administration.account, config.administration.password, function(err) {
+    client.bind('cn=root', 'root', function(err) {
           assert.ifError(err);
     });
 
@@ -24,13 +23,15 @@ module.exports = function (req,config,callback) {
     //Verification on data TODO
 
     //Search for existing user
-    
-    var uid = Guid.raw();
+    var opts = {
+        filter: '(email=*)',
+        scope: 'sub',
+        attributes: ['dn', 'sn', 'cn']
+    };
 
     function success() {
         //Prepare entry insertion
         var entry = {
-            uid: uid,
             cn: cn,
             sn: sn,
             mail: email,
@@ -41,14 +42,14 @@ module.exports = function (req,config,callback) {
         //console.log(require(__dirname+'/../subserv/data.json'));
 
         //Present data to LDAP
-        client.add('uid='+uid+', ou=members, dc='+config.global.domain+', dc='+config.global.TLD, entry, function(err) {
+        client.add('cn='+cn+', ou=members, dc='+config.global.domain+', dc='+config.global.TLD, entry, function(err) {
 
             if(err) console.log(err);
 
             var change = new ldap.Change({
                 operation: 'add',
                 modification: {
-                    member: ['uid='+uid+', ou=members, dc='+config.global.domain+', dc='+config.global.TLD]
+                    member: ['cn='+cn+', ou=members, dc='+config.global.domain+', dc='+config.global.TLD]
                 }
             });
 
@@ -63,29 +64,18 @@ module.exports = function (req,config,callback) {
         callback(false);
     }
 
-    var opts = {
-        filter: '(mail='+email+')',
-        scope: 'sub',
-        //attributes: ['*']
-    };
-
-    client.search('ou=members, dc='+config.global.domain+', dc='+config.global.TLD, opts, function(err, res) {
-        
-        var entries = [];
+    client.search('cn='+cn+', ou=members, dc='+config.global.domain+', dc='+config.global.TLD, opts, function(err, res) {
         res.on('searchEntry', function(entry) {
-            entries.push(entry.object);
+            failure();
         });
         res.on('searchReference', function(referral) {
+            failure();
         });
         res.on('error', function(err) {
-            console.error('error: ' + err.message);
+            success();
         });
         res.on('end', function(result) {
-            if(!entries.length) {
-                success();
-            } else {
-                failure();
-            }
+            failure();
         });
     });
 
