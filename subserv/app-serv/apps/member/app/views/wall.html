@@ -1,0 +1,22 @@
+<!-- HTML goes below -->
+
+<div class="container">
+	<div class="row well well-sm btn-group" role="group">
+		<button class="btn btn-secondary btn-lg"></button>
+		<button class="btn btn-default btn-lg"></button>
+		<button class="btn btn-secondary btn-lg"></button>
+		<button class="btn btn-default btn-lg"></button>
+		<button class="btn btn-default btn-lg"></button>
+		<button class="btn btn-secondary btn-lg"></button>
+		<button class="btn btn-secondary btn-lg"></button>
+		<button class="btn btn-secondary btn-lg"></button>
+	</div>
+	<div class="row well well-sm">
+		<label class="checkbox-inline"><input type="checkbox" value="">Option 1</label>
+		<label class="checkbox-inline"><input type="checkbox" value="">Option 2</label>
+		<label class="checkbox-inline"><input type="checkbox" value="">Option 3</label>
+	</div>
+	<div class="row">
+		<wall-item ng-repeat="item in items" title="{{item.title}}" desc="{{item.chapo}}" content="{{item.content}}" pubdate="{{item.publication_date}}"></wall-item>
+	</div>
+</div>
