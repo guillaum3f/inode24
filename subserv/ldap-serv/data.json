@@ -55,7 +55,8 @@
       "uid=a57d78e5-6475-19f1-d784-09b3c81d758e, ou=members, dc=innov24, dc=io",
       "uid=5d7c7b71-2ea3-06ed-ff92-2daa715a6a1d, ou=members, dc=innov24, dc=io",
       "cn=plop@yopmail.com, ou=members, dc=innov24, dc=io",
-      "uid=9fd890fa-7ad6-3b27-5564-b57d87901dd7, ou=members, dc=innov24, dc=io"
+      "uid=9fd890fa-7ad6-3b27-5564-b57d87901dd7, ou=members, dc=innov24, dc=io",
+      "uid=58b4e4a2-6dd6-0203-ede5-727271e7702d, ou=members, dc=innov24, dc=io"
     ]
   },
   "cn=communicator, ou=roles, dc=innov24, dc=io": {
@@ -415,6 +416,26 @@
     ],
     "uid": [
       "9fd890fa-7ad6-3b27-5564-b57d87901dd7"
+    ],
+    "userpassword": [
+      "toto"
+    ]
+  },
+  "uid=58b4e4a2-6dd6-0203-ede5-727271e7702d, ou=members, dc=innov24, dc=io": {
+    "cn": [
+      "rtrt@rtrt"
+    ],
+    "mail": [
+      "rtrt@rtrt"
+    ],
+    "objectclass": [
+      "inetOrgPerson"
+    ],
+    "sn": [
+      "toto"
+    ],
+    "uid": [
+      "58b4e4a2-6dd6-0203-ede5-727271e7702d"
     ],
     "userpassword": [
       "toto"
