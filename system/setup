@@ -11,6 +11,7 @@ read -p "Do you want to populate your service with a basic angularJS@1.5 app? " 
 case "${populate}" in
     [yY]|[oO]|"yes"|"YES")
         cp -r doc/app-example/* static/ &&
+        cp -r doc/sub-servers/app-serv subserv/ 
         cd static && bower install && cd .. 
         ;; 
 esac
@@ -63,5 +64,10 @@ case "${populate}" in
         ;; 
 esac
 unset populate
+
+echo "Because Git sucks...."
+cd subserv/app-serv/apps/member/app/vendor && git clone https://github.com/FortAwesome/Font-Awesome.git && 
+git clone https://github.com/BlackrockDigital/startbootstrap-simple-sidebar.git 
+cd ../../ && bower install
 
 echo "done"
