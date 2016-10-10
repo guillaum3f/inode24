@@ -6,7 +6,8 @@
     },
     "name" : "marvin",
     "run-subservers-at-boot" : {
-        "My LDAP Server" : "ldap-serv/ldapjs-serv.js"
+        "authserv" : "ldap-serv/ldapjs-serv.js",
+        "appserv" : "app-serv/app.js"
     },
     "administration" : {
         "account" : "root",
