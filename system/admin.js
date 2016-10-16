@@ -71,7 +71,7 @@ inquirer.prompt([{
                         _config.owner = resp.owner;
                         _config.description = resp.description;
                         _config.port = resp.host.split(':')[1];
-                        jsonfile.writeFile(__dirname+'/../config.json', _config, {spaces: 2}, function(err) {
+                        jsonfile.writeFile(__dirname+'/../services/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
                             console.error(err)
                         })
 
