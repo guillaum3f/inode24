@@ -1,7 +1,7 @@
 'use strict'
 
-var config_file = process.argv[2];
-var routes_file = process.argv[3];
+var this_config = process.argv[2];
+var this_routes = process.argv[3];
 
 var http = require('http');
 var fs = require('fs');
@@ -20,7 +20,7 @@ process.argv.forEach(function (val, index, array) {
 var config = require('./config/main.json');
 
 //Add global configuration
-if(config.file) config['global'] = require(config.file);
+if(this_config) config['global'] = require(this_config);
 
 //Require core libraries
 var deps = {};
@@ -42,27 +42,9 @@ recursive(config.fs.scripts, function(err, items) {
         scripts[path.substr(0,path.lastIndexOf("."))] = require(__dirname+'/' +items[i]);
     }
     //Require routes
-    if(routes_file) require(__dirname+'/'+routes_file)(app,config,scripts);
+    if(this_routes) require(__dirname+'/'+this_routes)(app,config,scripts);
 });
 
-//Optional
-if(config.options['enable-static-content'] === true) app.use(deps['express'].static(config.fs.static)); //serve a static app
-if(config.options.passport['use-passport'] === true) {
-    var strategy = config.options.passport['passport-strategy'];
-    if ( ! Array.isArray(strategy)) strategy = [strategy] 
-    for (var i=0; i<=strategy.length-1;i++) {
-        require(__dirname+'/scripts/passport-strategies/'+strategy[i])(deps['passport'],config);
-    }
-    app.use(deps['passport'].initialize()); //use passport
-}
-if(config.options['use-client-sessions'] === true) {
-    app.use(deps['client-sessions']({
-        cookieName: 'session', // cookie name dictates the key name added to the request object
-        secret: config.global['secret-key'], // should be a large unguessable string
-        duration: 24 * 60 * 60 * 1000, // how long the session will stay valid in ms
-        activeDuration: 1000 * 60 * 5 // if expiresIn < activeDuration, the session will be extended by activeDuration milliseconds
-    }));
-}
 
 //Set node identity
 if(config.global.address[config.name]) {
@@ -75,7 +57,7 @@ if(config.global.address[config.name]) {
     console.log('inode number '+config.ident);
 
 } else {
-    console.log('Error at boot, local config name "'+config.name+'" is not set in root config file (../config.json)');
+    console.log('Error at boot, local config name "'+config.name+'" is not set in root config file ('+this_config+')');
     console.log('It should match one of theses hosts:'+Object.keys(config.global.address).map(function (key) { return ' '+key; }));
     console.log('Modify local config name adequatly (./config/main.json)');
     return;
