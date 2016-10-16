@@ -66,9 +66,6 @@ fs.access(services_dir, fs.F_OK, function(err) {
 
 //Enable static content
 app.use(express.static(static_dir)); //serve a static app
-exec('cd '+static_dir+' && bower install', (error, stdout, stderr) => {
-    if(error) console.log(error);
-});
 
 
 //Start the server
