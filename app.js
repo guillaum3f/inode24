@@ -1,5 +1,8 @@
 'use strict'
 
+var config_file = process.argv[2];
+var routes_file = process.argv[3];
+
 var http = require('http');
 var fs = require('fs');
 var net = require('net');
@@ -17,7 +20,7 @@ process.argv.forEach(function (val, index, array) {
 var config = require('./config/main.json');
 
 //Add global configuration
-config['global'] = require('../config.json');
+if(config.file) config['global'] = require(config.file);
 
 //Require core libraries
 var deps = {};
@@ -39,7 +42,7 @@ recursive(config.fs.scripts, function(err, items) {
         scripts[path.substr(0,path.lastIndexOf("."))] = require(__dirname+'/' +items[i]);
     }
     //Require routes
-    require(__dirname+'/routes.js')(app,config,scripts);
+    if(routes_file) require(__dirname+'/'+routes_file)(app,config,scripts);
 });
 
 //Optional
