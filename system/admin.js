@@ -53,6 +53,12 @@ var functionality = [
     name: 'developper',
     message: 'Developper?*',
     required: true
+},
+{
+    type: 'input',
+    name: 'editor',
+    message: 'Favorite editor?*',
+    required: true
 }
 ];
 
@@ -108,9 +114,12 @@ inquirer.prompt([{
 
                 inquirer.prompt(functionality).then(function(resp) {
 
-                    exec('echo "//'+resp.description+'\n\nmodule.exports = function() {\n\n\n\n}" > ../scripts/'+resp.name+'.js', (error, stdout, stderr) => {
+                    exec('echo "//'+resp.description+'\n\nmodule.exports = function() {\n\n\n\n}" > ../scripts/'+resp.name+'.js', 
+                    (error, stdout, stderr) => {
+
+                        console.log('Execute that : '+resp.editor+' ../scripts/'+resp.name+'.js'); 
+
                     });
-                    console.log(resp);
                 });
 
             break;
