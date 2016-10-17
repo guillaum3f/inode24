@@ -61,7 +61,7 @@ inquirer.prompt([{
 
                     var file = __dirname+'/'+resp.config;
                     jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
-                        console.error(err)
+                        if(err) console.error(err)
                     })
 
                     exec('git clone https://github.com/guillaum3f/inode24.git ../services/'+resp.name, (error, stdout, stderr) => {
@@ -72,7 +72,7 @@ inquirer.prompt([{
                         _config.description = resp.description;
                         _config.port = resp.host.split(':')[1];
                         jsonfile.writeFile(__dirname+'/../services/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
-                            console.error(err)
+                            if(err) console.error(err)
                         })
 
                     });
