@@ -14,9 +14,11 @@ var platform = {};
 platform.config = require('./config.json');
 platform.scripts = {};
 platform.services = [];
+platform['third-part-servers'] = [];
 
 var scripts_dir = __dirname+'/scripts';
 var services_dir = __dirname+'/services';
+var third_part_servers_dir = __dirname+'/services/third-part-servers';
 var static_dir = __dirname+'/static';
 var routes_file = __dirname+'/routes.js';
 
@@ -46,6 +48,23 @@ fs.access(routes_file, fs.F_OK, function(err) {
         require(routes_file)(app,platform.config,platform.scripts);
     }
 });
+
+//Starts third-part-servers
+if(platform.config && platform.config['third-part-servers']) {
+    fs.access(third_part_servers_dir, fs.F_OK, function(err) {
+        if (!err) {
+            fs.readdir(third_part_servers_dir, function(err, items) {
+                for (var i=0; i<items.length; i++) {
+                    if(platform.config['third-part-servers'].indexOf(items[i]) > -1){
+                        exec('node '+third_part_servers_dir+'/'+items[i], (error, stdout, stderr) => {
+                            if(error) console.log(error);
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
 
 //Starts sub-services
 if(platform.config && platform.config.services) {
