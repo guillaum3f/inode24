@@ -1,9 +1,6 @@
 {
   "name": "innov24",
   "owner": "TCA",
-  "description": "Main Platform",
-  "port": "7777",
-  "third-part-servers": [
-    "LDAP.js"
-  ]
+  "description": "Journalism social workspace",
+  "port": "8080"
 }
