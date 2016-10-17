@@ -1,0 +1,6 @@
+{
+  "name": "testServ",
+  "owner": "TCA",
+  "description": "my new super TESTSERVER man",
+  "port": "8669"
+}
