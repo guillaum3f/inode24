@@ -24,12 +24,34 @@ var service = [
 {
     type: 'input',
     name: 'host',
-    message: 'Host and Port Number? [i.e localhost:8763]* ',
+    message: 'Host and Port Number?* [i.e localhost:8763] ',
     required: true
 },{
     type: 'input',
     name: 'config',
     message: 'Global config file to use?*',
+    required: true
+}
+];
+
+
+var functionality = [
+{
+    type: 'input',
+    name: 'name',
+    message: 'Functionality name?*',
+    required: true
+},
+{
+    type: 'input',
+    name: 'description',
+    message: 'Description?',
+    required: false
+},
+{
+    type: 'input',
+    name: 'developper',
+    message: 'Developper?*',
     required: true
 }
 ];
@@ -41,6 +63,7 @@ inquirer.prompt([{
   message: 'What do you want to do?',
   choices: [
       "Add a service",
+      "Add a functionality",
       new inquirer.Separator(),
       "Quit"
   ]
@@ -74,10 +97,20 @@ inquirer.prompt([{
                         jsonfile.writeFile(__dirname+'/../services/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
                             if(err) console.error(err)
                         })
-
                     });
 
 
+                });
+
+            break;
+
+            case 'Add a functionality':
+
+                inquirer.prompt(functionality).then(function(resp) {
+
+                    exec('echo "//'+resp.description+'\n\nmodule.exports = function() {\n\n\n\n}" > ../scripts/'+resp.name+'.js', (error, stdout, stderr) => {
+                    });
+                    console.log(resp);
                 });
 
             break;
