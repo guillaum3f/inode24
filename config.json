@@ -1,0 +1,9 @@
+{
+  "name": "innov24",
+  "owner": "TCA",
+  "description": "Platform",
+  "port": "8887",
+  "services": {
+    "test-server": "localhost:8788"
+  }
+}

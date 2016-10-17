@@ -7,6 +7,7 @@ var net = require('net');
 var recursive = require('recursive-readdir');
 var express = require('express');
 var bodyParser = require('body-parser');
+var jsonfile = require('jsonfile')
 const exec = require('child_process').exec;
 
 var platform = {};
