@@ -1,6 +1,9 @@
 {
-  "name": "testServ",
+  "name": "innov24",
   "owner": "TCA",
-  "description": "my new super TESTSERVER man",
-  "port": "8669"
+  "description": "Platform",
+  "port": "8887",
+  "services": {
+    "test-server": "localhost:8788"
+  }
 }

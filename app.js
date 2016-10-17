@@ -47,20 +47,22 @@ fs.access(routes_file, fs.F_OK, function(err) {
 });
 
 //Starts sub-services
-if(platform.config.services) {
+if(platform.config && platform.config.services) {
     fs.access(services_dir, fs.F_OK, function(err) {
         if (!err) {
             fs.readdir(services_dir, function(err, items) {
                 for (var i=0; i<items.length; i++) {
-                    platform.services.push(services_dir+'/'+items[i]);
-                    fs.access(services_dir+'/'+items[i]+'/app.js', fs.F_OK, function(err) {
-                        if (!err) {
-                            var item = platform.services.shift();
-                            exec('npm install --prefix '+item+' && node '+item+'/app.js', (error, stdout, stderr) => {
-                                if(error) console.log(error);
-                            });
-                        }
-                    });
+                    if(platform.config.services[items[i]]) {
+                        platform.services.push(services_dir+'/'+items[i]);
+                        fs.access(services_dir+'/'+items[i]+'/app.js', fs.F_OK, function(err) {
+                            if (!err) {
+                                var item = platform.services.shift();
+                                exec('npm install --prefix '+item+' && node '+item+'/app.js', (error, stdout, stderr) => {
+                                    if(error) console.log(error);
+                                });
+                            }
+                        });
+                    }
                 }
             });
         }
