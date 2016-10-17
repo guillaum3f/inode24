@@ -24,8 +24,6 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //Require user scripts
-
-//Require user scripts
 fs.access(scripts_dir, fs.F_OK, function(err) {
     if (!err) {
         fs.readdir(scripts_dir, function(err, items) {
@@ -45,7 +43,7 @@ fs.access(scripts_dir, fs.F_OK, function(err) {
 //Require routes
 fs.access(routes_file, fs.F_OK, function(err) {
     if (!err) {
-        require(routes_file)(app,platform);
+        require(routes_file)(app,platform.config,platform.scripts);
     }
 });
 
