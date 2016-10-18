@@ -6,7 +6,7 @@
   "third-part-servers": [
     "ldapjs-server.js"
   ],
-  "services": {
+  "servers": {
     "auth": "localhost:8081",
     "apps": "localhost:8082",
     "tools": "localhost:8083",

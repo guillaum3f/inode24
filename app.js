@@ -12,27 +12,27 @@ const exec = require('child_process').exec;
 
 var platform = {};
 platform.config = require('./config.json');
-platform.scripts = {};
-platform.services = [];
+platform.middlewares = {};
+platform.servers = [];
 platform['third-part-servers'] = [];
 
-var scripts_dir = __dirname+'/scripts';
-var services_dir = __dirname+'/services';
-var third_part_servers_dir = __dirname+'/services/third-part-servers';
+var middlewares_dir = __dirname+'/middlewares';
+var servers_dir = __dirname+'/servers';
+var third_part_servers_dir = __dirname+'/servers/third-part-servers';
 var static_dir = __dirname+'/static';
 var routes_dir = __dirname+'/routes';
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-//Require user scripts
-fs.access(scripts_dir, fs.F_OK, function(err) {
+//Require user middlewares
+fs.access(middlewares_dir, fs.F_OK, function(err) {
     if (!err) {
-        fs.readdir(scripts_dir, function(err, items) {
+        fs.readdir(middlewares_dir, function(err, items) {
             for (var i=0; i<items.length; i++) {
                 if(path.extname(items[i]) === '.js') {
                     try {
-                        platform.scripts[path.basename(items[i],'.js')] = require(scripts_dir+'/'+items[i]);
+                        platform.middlewares[path.basename(items[i],'.js')] = require(middlewares_dir+'/'+items[i]);
                     } catch (e) {
                         console.log(e);
                     }
@@ -45,7 +45,7 @@ fs.access(scripts_dir, fs.F_OK, function(err) {
 //Require routes
 //fs.access(routes_file, fs.F_OK, function(err) {
 //    if (!err) {
-//        require(routes_file)(app,platform.config,platform.scripts);
+//        require(routes_file)(app,platform.config,platform.middlewares);
 //    }
 //});
 
@@ -56,7 +56,7 @@ fs.access(routes_dir, fs.F_OK, function(err) {
             for (var i=0; i<items.length; i++) {
                 if(path.extname(items[i]) === '.js') {
                     try {
-                        require(routes_dir+'/'+items[i])(app,platform.config,platform.scripts);
+                        require(routes_dir+'/'+items[i])(app,platform.config,platform.middlewares);
                     } catch (e) {
                         console.log(e);
                     }
@@ -83,17 +83,17 @@ if(platform.config && platform.config['third-part-servers']) {
     });
 }
 
-//Starts sub-services
-if(platform.config && platform.config.services) {
-    fs.access(services_dir, fs.F_OK, function(err) {
+//Starts sub-servers
+if(platform.config && platform.config.servers) {
+    fs.access(servers_dir, fs.F_OK, function(err) {
         if (!err) {
-            fs.readdir(services_dir, function(err, items) {
+            fs.readdir(servers_dir, function(err, items) {
                 for (var i=0; i<items.length; i++) {
-                    if(platform.config.services[items[i]]) {
-                        platform.services.push(services_dir+'/'+items[i]);
-                        fs.access(services_dir+'/'+items[i]+'/app.js', fs.F_OK, function(err) {
+                    if(platform.config.servers[items[i]]) {
+                        platform.servers.push(servers_dir+'/'+items[i]);
+                        fs.access(servers_dir+'/'+items[i]+'/app.js', fs.F_OK, function(err) {
                             if (!err) {
-                                var item = platform.services.shift();
+                                var item = platform.servers.shift();
                                 exec('npm install --prefix '+item+' && node '+item+'/app.js', (error, stdout, stderr) => {
                                     if(error) console.log(error);
                                 });
@@ -114,8 +114,8 @@ app.use(express.static(static_dir)); //serve a static app
 fs.access(__dirname+'/../../config.json', fs.F_OK, function(err) {
     if (!err) {
         var _config = require(__dirname+'/../../config.json');
-        if(_config.services && _config.services[platform.config.name]) {
-            platform.config.port = _config.services[platform.config.name].split(':')[1];
+        if(_config.servers && _config.servers[platform.config.name]) {
+            platform.config.port = _config.servers[platform.config.name].split(':')[1];
             jsonfile.writeFile(__dirname+'/config.json', platform.config, {spaces: 2}, function(err) {
                 if(err) console.error(err)
             })
