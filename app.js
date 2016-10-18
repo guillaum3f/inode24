@@ -20,7 +20,7 @@ var scripts_dir = __dirname+'/scripts';
 var services_dir = __dirname+'/services';
 var third_part_servers_dir = __dirname+'/services/third-part-servers';
 var static_dir = __dirname+'/static';
-var routes_file = __dirname+'/routes.js';
+var routes_dir = __dirname+'/routes';
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -43,9 +43,26 @@ fs.access(scripts_dir, fs.F_OK, function(err) {
 });
 
 //Require routes
-fs.access(routes_file, fs.F_OK, function(err) {
+//fs.access(routes_file, fs.F_OK, function(err) {
+//    if (!err) {
+//        require(routes_file)(app,platform.config,platform.scripts);
+//    }
+//});
+
+//Require routes
+fs.access(routes_dir, fs.F_OK, function(err) {
     if (!err) {
-        require(routes_file)(app,platform.config,platform.scripts);
+        fs.readdir(routes_dir, function(err, items) {
+            for (var i=0; i<items.length; i++) {
+                if(path.extname(items[i]) === '.js') {
+                    try {
+                        require(routes_dir+'/'+items[i])(app,platform.config,platform.scripts);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            }
+        });
     }
 });
 

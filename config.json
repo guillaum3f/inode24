@@ -8,6 +8,8 @@
   ],
   "services": {
     "auth": "localhost:8081",
-    "apps": "localhost:8082"
+    "apps": "localhost:8082",
+    "tools": "localhost:8083",
+    "process": "localhost:8084"
   }
 }

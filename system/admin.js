@@ -1,6 +1,9 @@
 var inquirer = require('inquirer');
 var jsonfile = require('jsonfile')
 var mkdirp = require('mkdirp');
+var fs = require('fs');
+var path = require('path');
+var inquirer = require('inquirer');
 const exec = require('child_process').exec;
 
 var service = [
@@ -125,6 +128,7 @@ inquirer.prompt([{
       "Add a paar-service",
       "Add a third-part-server",
       "Add a functionality",
+      "Add a route",
       new inquirer.Separator(),
       "Quit"
   ]
@@ -207,11 +211,40 @@ inquirer.prompt([{
                             .name+'.js', 
                             (error, stdout, stderr) => {
 
-                                console.log('Execute '+resp.editor+' ../scripts/'+resp.name+'.js'); 
+                            console.log('Execute '+resp.editor+' ../scripts/'+resp.name+'.js'); 
 
                     });
                 });
 
+            break;
+
+            case 'Add a route':
+
+                fs.readdir('../scripts/', function (err, files) {
+
+                    var scripts = [];
+                    for(var i=0; i<files.length; i++) {
+                        if(path.extname(files[i]) === '.js') {
+                            scripts.push(files[i].slice(0,-3));
+                        }
+                    }
+
+                   inquirer.prompt([{
+                       type: 'list',
+                       name: 'target',
+                       message : 'Which functionnality do you want to expose?',
+                       paginated : true,
+                       choices: scripts
+                   }]).then(function (answers) {
+                       fs.readFile('../scripts/'+answers.target+'.js', 'utf8', function (err,data) {
+                           if (err) {
+                               return console.log(err);
+                           }
+                           console.log(data);
+                       });
+                    });
+                });
+                
             break;
 
             case 'Quit':
