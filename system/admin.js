@@ -15,8 +15,8 @@ var server = [
 },
 {
     type: 'input',
-    name: 'demiddlewareion',
-    message: 'Demiddlewareion?',
+    name: 'description',
+    message: 'description?',
     required: false
 },
 {
@@ -54,8 +54,8 @@ var third_part_server = [
 },
 {
     type: 'input',
-    name: 'demiddlewareion',
-    message: 'Demiddlewareion?',
+    name: 'description',
+    message: 'description?',
     required: false
 },
 {
@@ -95,8 +95,8 @@ var functionality = [
 },
 {
     type: 'input',
-    name: 'demiddlewareion',
-    message: 'Demiddlewareion?',
+    name: 'description',
+    message: 'description?',
     required: false
 },
 {
@@ -162,7 +162,7 @@ function main() {
                             var _config = {};
                             _config.name = resp.name;
                             _config.owner = resp.owner;
-                            _config.demiddlewareion = resp.demiddlewareion;
+                            _config.description = resp.description;
                             _config.licence = resp.licence;
                             _config.port = resp.host.split(':')[1];
                             jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
@@ -196,7 +196,7 @@ function main() {
                         if(err) console.error(err)
                     })
 
-                    exec('echo "/*Name : '+resp.name+'\nDemiddlewareion : '+resp.demiddlewareion+'\nLicence : '+resp.licence+'*/\n" > '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js', (error, stdout, stderr) => {
+                    exec('echo "/*Name : '+resp.name+'\ndescription : '+resp.description+'\nLicence : '+resp.licence+'*/\n" > '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js', (error, stdout, stderr) => {
 
                         console.log('Execute '+resp.editor+' '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js'); 
 
@@ -211,7 +211,7 @@ function main() {
                 inquirer.prompt(functionality).then(function(resp) {
 
                     fs.writeFile(__dirname+'/../middlewares/'+resp.name+'.js', '/*\n'+
-                        ' * Demiddlewareion : '+resp.demiddlewareion+'\n'+
+                        ' * description : '+resp.description+'\n'+
                         ' * Author : '+resp.developper+'\n'+
                         ' * Licence : '+resp.licence+'\n'+
                         '*/\n\n'+
