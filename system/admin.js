@@ -4,6 +4,7 @@ var mkdirp = require('mkdirp');
 var fs = require('fs');
 var path = require('path');
 var inquirer = require('inquirer');
+var child_process = require('child_process');
 const exec = require('child_process').exec;
 
 var server = [
@@ -11,37 +12,53 @@ var server = [
     type: 'input',
     name: 'name',
     message: 'server name?*',
-    required: true
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'description',
-    message: 'description?',
-    required: false
+    message: 'description?*',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'licence',
-    message: 'Licence?*',
-    required: true
+    message: 'Licence?',
+    default: 'none',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'owner',
     message: 'Owner?',
-    required: false
+    default: 'none',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'host',
     message: 'Host and Port Number?* [i.e localhost:8763] ',
-    required: true
+    validate: function(str){
+        if(str.split(':').length === 2) {
+            return true;
+        }
+    }
 },
 {
     type: 'input',
     name: 'config',
     message: 'Global config file to use?*',
-    required: true
+    validate: function(str){
+        return !!str;
+    }
 }
 ];
 
@@ -49,73 +66,98 @@ var third_part_server = [
 {
     type: 'input',
     name: 'name',
-    message: 'server name?*',
-    required: true
+    message: 'Server name?*',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'description',
-    message: 'description?',
-    required: false
+    message: 'Description?*',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'owner',
     message: 'Owner?*',
-    required: true
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'licence',
-    message: 'Licence?*',
-    required: true
+    message: 'Licence?',
+    default: 'none',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'config',
-    message: 'Global config file to use?*',
-    required: true
+    message: 'Global config file to use with?*',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'editor',
-    message: 'Your favorite code editor?*',
-    required: true
+    message: 'Your favorite code editor?',
+    default: 'vim',
+    validate: function(str){
+        return !!str;
+    }
 }
 ];
 
 
 
-var functionality = [
+var middleware = [
 {
     type: 'input',
     name: 'name',
-    message: 'Functionality name?*',
-    required: true
+    message: 'Middleware name?*',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'description',
-    message: 'description?',
-    required: false
+    message: 'Description?*',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'developper',
     message: 'Developper?*',
-    required: true
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'licence',
-    message: 'Licence?*',
-    required: true
+    message: 'Licence?',
+    default: 'none',
+    validate: function(str){
+        return !!str;
+    }
 },
 {
     type: 'input',
     name: 'editor',
     message: 'Your favorite code editor?*',
-    required: true
+    validate: function(str){
+        return !!str;
+    }
 }
 ];
 
@@ -132,10 +174,10 @@ function main() {
         choices: [
             "Add a server (node)",
             "Add a third-part-server",
-            "Add a functionality",
-                "Add a route",
-                new inquirer.Separator(),
-                    "Quit"
+            "Add a middleware",
+            "Add a route",
+            new inquirer.Separator(),
+            "Quit"
         ]
     }]).then(function (answers) {
         switch(answers.options) {
@@ -163,7 +205,7 @@ function main() {
                             _config.name = resp.name;
                             _config.owner = resp.owner;
                             _config.description = resp.description;
-                            _config.licence = resp.licence;
+                            _config.licence = resp.licence || 'none';
                             _config.port = resp.host.split(':')[1];
                             jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
                                 if(err) console.error(err)
@@ -196,7 +238,7 @@ function main() {
                         if(err) console.error(err)
                     })
 
-                    exec('echo "/*Name : '+resp.name+'\ndescription : '+resp.description+'\nLicence : '+resp.licence+'*/\n" > '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js', (error, stdout, stderr) => {
+                    exec('echo "/*Name : '+resp.name+'\ndescription : '+resp.description+'\nLicence : '+resp.licence +'*/\n" > '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js', (error, stdout, stderr) => {
 
                         console.log('Execute '+resp.editor+' '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js'); 
 
@@ -206,9 +248,9 @@ function main() {
 
                 break;
 
-            case 'Add a functionality':
+            case 'Add a middleware':
 
-                inquirer.prompt(functionality).then(function(resp) {
+                inquirer.prompt(middleware).then(function(resp) {
 
                     fs.writeFile(__dirname+'/../middlewares/'+resp.name+'.js', '/*\n'+
                         ' * description : '+resp.description+'\n'+
@@ -224,7 +266,13 @@ function main() {
                                if(err) {
                                    return console.log(err);
                                }
-                        back_to_main("The file was saved!\nTo edit it, execute "+resp.editor+' '+__dirname+'/../middlewares/'+resp.name+'.js');
+                               var child = child_process.spawn(resp.editor, [__dirname+'/../middlewares/'+resp.name+'.js'], {
+                                       stdio: 'inherit'
+                               });
+
+                               child.on('exit', function (e, code) {
+                                    back_to_main('The file was saved!');
+                               });
                     }); 
 
                 });
@@ -232,12 +280,6 @@ function main() {
                 break;
 
             case 'Add a route':
-
-                //1)select a method (get, post, put, etc...)
-                //2) ask user : does he want to expose an existing functionality or create a new one and expose it or create a singleton?
-                //3)a)if expose, do expose
-                //3)b)if create && expose, do create a middleware && expose
-                //3)c)if singleton, do write code
 
                 var _route = {};
 
@@ -248,6 +290,8 @@ function main() {
                     choices: ['get', 'post']
                 }]).then(function (answers) {
 
+                    _route.method = answers.method;
+
                     switch(answers.method) {
                         case 'get':
                         case 'post':
@@ -257,41 +301,74 @@ function main() {
                                 var middlewares = [];
                                 for(var i=0; i<files.length; i++) {
                                     if(path.extname(files[i]) === '.js') {
-                                        middlewares.push(files[i].slice(0,-3));
+                                        middlewares.push({ 'name' : files[i].slice(0,-3) });
                                     }
                                 }
 
                                 if(middlewares.length) {
 
                                     inquirer.prompt([{
-                                        type: 'list',
-                                        name: 'target',
-                                        message : 'Which functionnality do you want to expose?',
-                                        paginated : true,
+                                        type: 'checkbox',
+                                        name: 'middlewares',
+                                        message : 'Which middleware(s) do you want to expose?',
                                         choices: middlewares
                                     }]).then(function (answers) {
 
-                                        _route.target = answers.target;
+                                        _route.middlewares = answers.middlewares;
 
-                                        fs.writeFile(__dirname+'/../routes/'+answers.target+'.js', ''+
-                                                'module.exports = function(app, config, middlewares) {'+
-                                                    '\n'+
-                                                        '\n\tapp.'+_route.method+'("/'+_route.target+'", middlewares.'+_route.target+', function(req, res) {'+
-                                                            '\n\t\tres.end();'+
-                                                                '\n\t});'+
-                                                        '\n'+
-                                                        '\n};'+
-                                                        '', function(err) {
-                                                            if(err) {
-                                                                return console.log(err);
-                                                            }
+                                        for(var md in _route.middlewares) {
+                                            console.log(parseInt(md,10)+1 +')'+_route.middlewares[md]);
+                                        }
 
-                                                            back_to_main("The file was saved!");
-                                                        }); 
+                                        inquirer.prompt([{
+                                            type: 'input',
+                                            name: 'order',
+                                            message : 'Specify order?'
+                                        }]).then(function (answers) {
+
+                                            var chain = '';
+                                            for(var i=0; i<answers.order.length; i++) {
+                                                if(i === answers.order.length-1) {
+                                                    chain += 'middlewares.'+_route.middlewares[parseInt(answers.order[i],10)-1];
+                                                } else {
+                                                    chain += 'middlewares.'+_route.middlewares[parseInt(answers.order[i],10)-1]+'->';
+                                                }
+                                            }
+
+                                            console.log(chain);
+                                            _route.target = (chain.split('->')[chain.split('->').length-1]).split('.')[1];
+                                            _route.targets = chain.split('->').join(', ');
+
+                                            inquirer.prompt([{
+                                                type: 'input',
+                                                name: 'main',
+                                                message : 'Route name?',
+                                                default : _route.target 
+                                            }]).then(function (answers) {
+
+                                                fs.writeFile(__dirname+'/../routes/'+answers.main+'.js', ''+
+                                                        'module.exports = function(app, config, middlewares) {'+
+                                                            '\n'+
+                                                                '\n\tapp.'+_route.method+'("/'+answers.main+'", '+_route.targets+', function(req, res) {'+
+                                                                    '\n\n\t\tres.end();'+
+                                                                        '\n\t});'+
+                                                                '\n'+
+                                                                '\n};'+
+                                                                '', function(err) {
+                                                                    if(err) {
+                                                                        return console.log(err);
+                                                                    }
+
+                                                                    back_to_main("The file was saved!");
+                                                                }); 
+
+                                                });
+                                            });
+
                                     });
 
                                 } else {
-                                    back_to_main("Sorry no functionality available.");
+                                    back_to_main('Sorry no middleware available.');
                                 }
                             });
 
