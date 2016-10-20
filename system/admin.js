@@ -175,7 +175,9 @@ function main() {
             "Add a server (node)",
             "Add a third-part-server",
             "Add a middleware",
-            "Add a route",
+            "Add a local route",
+            "Add a distant route",
+            "Add a hybrid route",
             new inquirer.Separator(),
             "Quit"
         ]
@@ -279,7 +281,7 @@ function main() {
 
                 break;
 
-            case 'Add a route':
+            case 'Add a local route':
 
                 var _route = {};
 
@@ -329,9 +331,9 @@ function main() {
                                             var chain = '';
                                             for(var i=0; i<answers.order.length; i++) {
                                                 if(i === answers.order.length-1) {
-                                                    chain += 'middlewares.'+_route.middlewares[parseInt(answers.order[i],10)-1];
+                                                    chain += 'middlewares["'+_route.middlewares[parseInt(answers.order[i],10)-1]+'"]';
                                                 } else {
-                                                    chain += 'middlewares.'+_route.middlewares[parseInt(answers.order[i],10)-1]+'->';
+                                                    chain += 'middlewares["'+_route.middlewares[parseInt(answers.order[i],10)-1]+'"]->';
                                                 }
                                             }
 
@@ -346,7 +348,7 @@ function main() {
                                                 default : _route.target 
                                             }]).then(function (answers) {
 
-                                                fs.writeFile(__dirname+'/../routes/'+answers.main+'.js', ''+
+                                                fs.writeFile(__dirname+'/../routes/'+answers.main+'-'+_route.method+'.js', ''+
                                                         'module.exports = function(app, config, middlewares) {'+
                                                             '\n'+
                                                                 '\n\tapp.'+_route.method+'("/'+answers.main+'", '+_route.targets+', function(req, res) {'+
@@ -379,6 +381,30 @@ function main() {
 
                 }); 
 
+                break;
+
+            case 'Add a distant route':
+
+                inquirer.prompt([{
+                    type: 'input',
+                    name: 'host',
+                    message : 'Specify the distant host:'
+                },{
+                    type: 'input',
+                    name: 'port',
+                    message : 'Specify the port to use:'
+                },{
+                    type: 'list',
+                    name: 'mode',
+                    message : 'Choose a mode:',
+                    choices : ['ajax','proxy']
+                }]).then(function (answers) {
+                    
+                });
+
+                break;
+
+            case 'Add a hybrid route':
                 break;
 
             case 'Quit':
