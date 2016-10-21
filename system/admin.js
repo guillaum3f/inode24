@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var inquirer = require('inquirer');
 var child_process = require('child_process');
+var request = require('request');
 const exec = require('child_process').exec;
 
 var server = [
@@ -177,7 +178,6 @@ function main() {
             "Add a middleware",
             "Add a local route",
             "Add a distant route",
-            "Add a hybrid route",
             new inquirer.Separator(),
             "Quit"
         ]
@@ -385,6 +385,8 @@ function main() {
 
             case 'Add a distant route':
 
+                var _route = {};
+
                 inquirer.prompt([{
                     type: 'input',
                     name: 'host',
@@ -393,18 +395,165 @@ function main() {
                     type: 'input',
                     name: 'port',
                     message : 'Specify the port to use:'
-                },{
-                    type: 'list',
-                    name: 'mode',
-                    message : 'Choose a mode:',
-                    choices : ['ajax','proxy']
                 }]).then(function (answers) {
-                    
+
+                    _route.host = 'http://'+answers.host+':'+answers.port;
+
+                    request.get(_route.host+'/routes', function(error, response, body) {
+                            if(error) throw error;
+                            inquirer.prompt([{
+                                type: 'list',
+                                name: 'target',
+                                message : 'Select a distant route:',
+                                choices : body.split('\n')
+                            }]).then(function (answers) {
+
+                                _route.method = answers.target.split(' ')[1].toLowerCase();
+                                _route.target = answers.target.split(' ')[2];
+
+                                var mode_list=['grasp data'];
+                                if(_route.method === 'get') {
+                                    mode_list.push('proxify request');
+                                }
+
+                                inquirer.prompt([{
+                                    type: 'list',
+                                    name: 'mode',
+                                    message : 'Choose a mode:',
+                                    choices : mode_list
+                                }]).then(function (answers) {
+
+                                    switch(answers.mode) {
+                                        case 'grasp data':
+
+                                            inquirer.prompt([{
+                                                type: 'input',
+                                                name: 'local-name',
+                                                message : 'Local route name?',
+                                                default : _route.target
+                                            },{
+                                                type: 'list',
+                                                name: 'local-method',
+                                                message : 'select a method',
+                                                default: _route.method,
+                                                         choices: ['get', 'post']
+                                            }]).then(function (answers) {
+
+                                                switch(answers['local-method']) {
+                                                    case 'get':
+                                                        _route.data = 'req.query';
+                                                        break;
+
+                                                    case 'post':
+                                                        _route.data = 'req.body';
+                                                        break;
+
+                                                    default:
+                                                        _route.data = '{}';
+                                                        break;
+                                                }
+
+                                                fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+answers['local-method']+'.js', ''+
+                                                        'const request = require("request");\n\n'+
+                                                        'module.exports = function(app, config, middlewares) {\n\n'+
+                                                            '\tapp.'+answers['local-method']+'("/'+answers['local-name']+'", function(req, res) {\n\n'+
+                                                                '\t\trequest({\n'+
+                                                                    '\t\t\turl: "'+_route.host+'/'+_route.target+'", //URL to hit\n'+
+                                                                    '\t\t\t\tqs: '+_route.data+', //Query string data\n'+
+                                                                    '\t\t\t\tmethod: "'+_route.method+'",\n'+
+                                                                        '\t\t\t\t//headers: {\n'+
+                                                                        '\t\t\t\t//    "Content-Type": "MyContentType",\n'+
+                                                                        '\t\t\t\t//    "Custom-Header": "Custom Value"\n'+
+                                                                        '\t\t\t\t//},\n'+
+                                                                        '\t\t\t\tbody: "Hello Hello! String body!" //Set the body as a string\n'+
+                                                                        '\t\t\t}, function(error, response, body){\n'+
+                                                                            '\t\t\t\tif(error) {\n'+
+                                                                                '\t\t\t\t\tconsole.log(error);\n'+
+                                                                                    '\t\t\t\t} else {\n'+
+                                                                                        '\t\t\t\t\tres.write(body);\n'+
+                                                                                            '\t\t\t\t}\n\n'+
+                                                                                            '\t\t\t\tres.end();\n'+
+                                                                                            '\t\t});\n'+
+                                                                    '\t});\n'+
+                                                                '}\n'+
+                                                                '', function(err) {
+                                                                    if(err) {
+                                                                        return console.log(err);
+                                                                    }
+
+                                                                    back_to_main("The file was saved!");
+                                                                }); 
+
+                                            });
+
+                                            break;
+
+                                        case 'proxify request':
+
+                                            inquirer.prompt([{
+                                                type: 'input',
+                                                name: 'local-name',
+                                                message : 'Route name?',
+                                                default : _route.target
+                                            }]).then(function (answers) {
+
+                                                switch(_route.method) {
+                                                    case 'get':
+                                                        _route.data = 'req.query';
+                                                        break;
+
+                                                    case 'post':
+                                                        _route.data = 'req.body';
+                                                        break;
+
+                                                    default:
+                                                        _route.data = '{}';
+                                                        break;
+                                                }
+
+                                                var patch_request = '';
+                                                var target;
+
+                                                if(_route.target !== answers['local-name']) { 
+                                                    patch_request += '\t\tvar params = (req.url.split && req.url.split("?").length === 2) ? "?"+req.url.split("?")[1] : "";\n\t\treq.url="";\n';
+                                                    target = '"'+_route.host+'/'+_route.target+'"+params';
+                                                } else {
+                                                    target = '"'+_route.host+'"';
+                                                }
+
+                                                fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+_route.method+'.js', ''+
+                                                        'const httpProxy = require("http-proxy");\n'+
+                                                        'const proxy = httpProxy.createProxyServer({});\n\n'+
+                                                        'module.exports = function(app, config, middlewares) {\n\n'+
+                                                        '\tapp.'+_route.method+'("/'+answers['local-name']+'", function(req, res) {\n\n'+
+
+                                                            patch_request+
+                                                            '\t\tproxy.web(req, res, { target: '+target+' }, \n'+
+                                                            '\t\tfunction(err) { if(err) throw err; });\n\n'+
+
+                                                            '\t});\n\n'+
+                                                            '}\n'+
+                                                            '', function(err) {
+                                                                if(err) {
+                                                                    return console.log(err);
+                                                                }
+
+                                                                back_to_main("The file was saved!");
+
+                                                                }); 
+
+                                            });
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                });
+
+                            });
+                        });
+
                 });
-
-                break;
-
-            case 'Add a hybrid route':
                 break;
 
             case 'Quit':

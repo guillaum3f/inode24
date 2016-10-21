@@ -19,9 +19,13 @@ module.exports = function(req, res, next) {
     }
 
     fs.readdir(folder, (err, files) => {
-        files.forEach(file => {
+        files.forEach((file, idx, arr) => {
             if(path.extname(file) === '.js') {
-                res.write(route(file)+'\n');
+                if (idx === arr.length - 1){ 
+                    res.write(route(file));
+                } else {
+                    res.write(route(file)+'\n');
+                }
             }
         });
 	    next();
