@@ -162,9 +162,35 @@ var middleware = [
 }
 ];
 
+function large_display(message) {
+    console.log('\n**** '+message+' ****\n');
+}
+
 function back_to_main(message) {
-    console.log('\n****'+message+'****\n');
+    large_display(message);
     main();
+}
+
+function overWrite(item, callback) {
+
+    fs.stat(item, function(err, stat) {
+        if(err == null) {
+            large_display('Item '+item+' exists');
+            inquirer.prompt([{
+                type: 'list',
+                name: 'overwrite',
+                message: 'Overwrite?',
+                choices: ['yes','no'],
+                default: 'no'
+            }]).then(function (answers) {
+                if(answers.overwrite === 'yes') {
+                    callback();
+                }
+            });
+        } else {
+            callback();
+        }
+    });
 }
 
 function main() {
@@ -254,28 +280,32 @@ function main() {
 
                 inquirer.prompt(middleware).then(function(resp) {
 
-                    fs.writeFile(__dirname+'/../middlewares/'+resp.name+'.js', '/*\n'+
-                        ' * description : '+resp.description+'\n'+
-                        ' * Author : '+resp.developper+'\n'+
-                        ' * Licence : '+resp.licence+'\n'+
-                        '*/\n\n'+
-                        'module.exports = function(req, res, next) {'+
-                        '\n\t'+
-                        '\n\t'+
-                        '\n\tnext();'+
-                        '\n\t'+
-                        '\n};', function(err) {
-                               if(err) {
-                                   return console.log(err);
-                               }
-                               var child = child_process.spawn(resp.editor, [__dirname+'/../middlewares/'+resp.name+'.js'], {
-                                       stdio: 'inherit'
-                               });
+                    overWrite(__dirname+'/../middlewares/'+resp.name+'.js', function() {
+                        fs.writeFile(__dirname+'/../middlewares/'+resp.name+'.js', 
+                                '/*\n'+
+                                ' * description : '+resp.description+'\n'+
+                                ' * Author : '+resp.developper+'\n'+
+                                ' * Licence : '+resp.licence+'\n'+
+                                '*/\n\n'+
+                                'module.exports = function(req, res, next) {'+
+                                    '\n\t'+
+                                        '\n\t'+
+                                        '\n\tnext();'+
+                                        '\n\t'+
+                                        '\n};', function(err) {
+                                            if(err) {
+                                                return console.log(err);
+                                            }
+                                            var child = child_process.spawn(resp.editor, [__dirname+'/../middlewares/'+resp.name+'.js'], {
+                                                stdio: 'inherit'
+                                            });
 
-                               child.on('exit', function (e, code) {
-                                    back_to_main('The file was saved!');
-                               });
-                    }); 
+                                            child.on('exit', function (e, code) {
+                                                back_to_main('The file was saved!');
+                                            });
+                                        }); 
+                    });
+
 
                 });
 
@@ -348,7 +378,8 @@ function main() {
                                                 default : _route.target 
                                             }]).then(function (answers) {
 
-                                                fs.writeFile(__dirname+'/../routes/'+answers.main+'-'+_route.method+'.js', ''+
+                                                overWrite(__dirname+'/../routes/'+answers.main+'-'+_route.method+'.js', function() {
+                                                    fs.writeFile(__dirname+'/../routes/'+answers.main+'-'+_route.method+'.js', ''+
                                                         'module.exports = function(app, config, middlewares) {'+
                                                             '\n'+
                                                                 '\n\tapp.'+_route.method+'("/'+answers.main+'", '+_route.targets+', function(req, res) {'+
@@ -363,6 +394,7 @@ function main() {
 
                                                                     back_to_main("The file was saved!");
                                                                 }); 
+                                                    });
 
                                                 });
                                             });
@@ -453,7 +485,8 @@ function main() {
                                                         break;
                                                 }
 
-                                                fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+answers['local-method']+'.js', ''+
+                                                overWrite(__dirname+'/../routes/'+answers['local-name']+'-'+answers['local-method']+'.js', function() {
+                                                    fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+answers['local-method']+'.js', ''+
                                                         'const request = require("request");\n\n'+
                                                         'module.exports = function(app, config, middlewares) {\n\n'+
                                                             '\tapp.'+answers['local-method']+'("/'+answers['local-name']+'", function(req, res) {\n\n'+
@@ -484,6 +517,7 @@ function main() {
                                                                     back_to_main("The file was saved!");
                                                                 }); 
 
+                                                    });
                                             });
 
                                             break;
@@ -521,7 +555,8 @@ function main() {
                                                     target = '"'+_route.host+'"';
                                                 }
 
-                                                fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+_route.method+'.js', ''+
+                                                overWrite(__dirname+'/../routes/'+answers['local-name']+'-'+_route.method+'.js', function() {
+                                                    fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+_route.method+'.js', ''+
                                                         'const httpProxy = require("http-proxy");\n'+
                                                         'const proxy = httpProxy.createProxyServer({});\n\n'+
                                                         'module.exports = function(app, config, middlewares) {\n\n'+
@@ -542,6 +577,7 @@ function main() {
 
                                                                 }); 
 
+                                                    });
                                             });
                                             break;
 
