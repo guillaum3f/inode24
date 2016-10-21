@@ -203,7 +203,7 @@ function main() {
             "Add a third-part-server",
             "Add a middleware",
             "Add a local route",
-            "Add a distant route",
+            "Add a remote route",
             new inquirer.Separator(),
             "Quit"
         ]
@@ -415,28 +415,37 @@ function main() {
 
                 break;
 
-            case 'Add a distant route':
+            case 'Add a remote route':
 
                 var _route = {};
 
-                inquirer.prompt([{
-                    type: 'input',
-                    name: 'host',
-                    message : 'Specify the distant host:'
-                },{
-                    type: 'input',
-                    name: 'port',
-                    message : 'Specify the port to use:'
-                }]).then(function (answers) {
+                fs.readdir(__dirname+'/../middlewares/', function (err, files) {
 
-                    _route.host = 'http://'+answers.host+':'+answers.port;
+                    _route.middlewares = [];
+                    for(var i=0; i<files.length; i++) {
+                        if(path.extname(files[i]) === '.js') {
+                            _route.middlewares.push({ 'name' : files[i].slice(0,-3) });
+                        }
+                    }
 
-                    request.get(_route.host+'/routes', function(error, response, body) {
+                    inquirer.prompt([{
+                        type: 'input',
+                        name: 'host',
+                        message : 'Specify the remote host:'
+                    },{
+                        type: 'input',
+                        name: 'port',
+                        message : 'Specify the remote port to use:'
+                    }]).then(function (answers) {
+
+                        _route.host = 'http://'+answers.host+':'+answers.port;
+
+                        request.get(_route.host+'/routes', function(error, response, body) {
                             if(error) throw error;
                             inquirer.prompt([{
                                 type: 'list',
                                 name: 'target',
-                                message : 'Select a distant route:',
+                                message : 'Select a remote route (destination) :',
                                 choices : body.split('\n')
                             }]).then(function (answers) {
 
@@ -466,12 +475,15 @@ function main() {
                                             },{
                                                 type: 'list',
                                                 name: 'local-method',
-                                                message : 'select a method',
+                                                message : 'select a local method',
                                                 default: _route.method,
                                                          choices: ['get', 'post']
                                             }]).then(function (answers) {
 
-                                                switch(answers['local-method']) {
+                                                _route['local-name'] = answers['local-name'];
+                                                _route['local-method'] = answers['local-method'];
+
+                                                switch(_route['local-method']) {
                                                     case 'get':
                                                         _route.data = 'req.query';
                                                         break;
@@ -485,39 +497,126 @@ function main() {
                                                         break;
                                                 }
 
-                                                overWrite(__dirname+'/../routes/'+answers['local-name']+'-'+answers['local-method']+'.js', function() {
-                                                    fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+answers['local-method']+'.js', ''+
-                                                        'const request = require("request");\n\n'+
-                                                        'module.exports = function(app, config, middlewares) {\n\n'+
-                                                            '\tapp.'+answers['local-method']+'("/'+answers['local-name']+'", function(req, res) {\n\n'+
-                                                                '\t\trequest({\n'+
-                                                                    '\t\t\turl: "'+_route.host+'/'+_route.target+'", //URL to hit\n'+
-                                                                    '\t\t\t\tqs: '+_route.data+', //Query string data\n'+
-                                                                    '\t\t\t\tmethod: "'+_route.method+'",\n'+
-                                                                        '\t\t\t\t//headers: {\n'+
-                                                                        '\t\t\t\t//    "Content-Type": "MyContentType",\n'+
-                                                                        '\t\t\t\t//    "Custom-Header": "Custom Value"\n'+
-                                                                        '\t\t\t\t//},\n'+
-                                                                        '\t\t\t\tbody: "Hello Hello! String body!" //Set the body as a string\n'+
-                                                                        '\t\t\t}, function(error, response, body){\n'+
-                                                                            '\t\t\t\tif(error) {\n'+
-                                                                                '\t\t\t\t\tconsole.log(error);\n'+
-                                                                                    '\t\t\t\t} else {\n'+
-                                                                                        '\t\t\t\t\tres.write(body);\n'+
-                                                                                            '\t\t\t\t}\n\n'+
-                                                                                            '\t\t\t\tres.end();\n'+
-                                                                                            '\t\t});\n'+
-                                                                    '\t});\n'+
-                                                                '}\n'+
-                                                                '', function(err) {
-                                                                    if(err) {
-                                                                        return console.log(err);
+                                                inquirer.prompt([{
+                                                    type: 'list',
+                                                    name: 'inject',
+                                                    message : 'Do you want to inject some middleware(s) locally?',
+                                                    choices: ['yes','no']
+                                                }]).then(function (answers) {
+                                                    if(answers.inject === 'yes') {
+                                                        inquirer.prompt([{
+                                                            type: 'checkbox',
+                                                            name: 'middlewares',
+                                                            message : 'Select local middleware(s):',
+                                                            choices: _route.middlewares
+                                                        }]).then(function (answers) {
+
+                                                            _route._middlewares = answers.middlewares;
+
+                                                            for(var md in _route._middlewares) {
+                                                                console.log(parseInt(md,10)+1 +')'+_route._middlewares[md]);
+                                                            }
+
+                                                            inquirer.prompt([{
+                                                                type: 'input',
+                                                                name: 'order',
+                                                                message : 'Specify order?'
+                                                            }]).then(function (answers) {
+
+                                                                var chain = '';
+                                                                for(var i=0; i<answers.order.length; i++) {
+                                                                    if(i === answers.order.length-1) {
+                                                                        chain += 'middlewares["'+_route._middlewares[parseInt(answers.order[i],10)-1]+'"]';
+                                                                    } else {
+                                                                        chain += 'middlewares["'+_route._middlewares[parseInt(answers.order[i],10)-1]+'"]->';
                                                                     }
+                                                                }
 
-                                                                    back_to_main("The file was saved!");
-                                                                }); 
+                                                                if(_route._middlewares.length) {
+                                                                    console.log(chain);
+                                                                    _route.targets = ' '+chain.split('->').join(', ')+', ';
+                                                                } else {
+                                                                    _route.targets = '';
+                                                                }
 
-                                                    });
+                                                                overWrite(__dirname+'/../routes/'+_route['local-name']+'-'+_route['local-method']+'.js', function() {
+                                                                    fs.writeFile(__dirname+'/../routes/'+_route['local-name']+'-'+_route['local-method']+'.js', ''+
+                                                                            'const request = require("request");\n\n'+
+                                                                            'module.exports = function(app, config, middlewares) {\n\n'+
+                                                                                '\tapp.'+_route['local-method']+'("/'+_route['local-name']+'",'+_route.targets+' function(req, res) {\n\n'+
+                                                                                    '\t\trequest({\n'+
+                                                                                        '\t\t\turl: "'+_route.host+'/'+_route.target+'", //URL to hit\n'+
+                                                                                        '\t\t\t\tqs: '+_route.data+', //Query string data\n'+
+                                                                                        '\t\t\t\tmethod: "'+_route.method+'",\n'+
+                                                                                            '\t\t\t\t//headers: {\n'+
+                                                                                            '\t\t\t\t//    "Content-Type": "MyContentType",\n'+
+                                                                                            '\t\t\t\t//    "Custom-Header": "Custom Value"\n'+
+                                                                                            '\t\t\t\t//},\n'+
+                                                                                            '\t\t\t\tbody: "Hello Hello! String body!" //Set the body as a string\n'+
+                                                                                            '\t\t\t}, function(error, response, body){\n'+
+                                                                                                '\t\t\t\tif(error) {\n'+
+                                                                                                    '\t\t\t\t\tconsole.log(error);\n'+
+                                                                                                        '\t\t\t\t} else {\n'+
+                                                                                                            '\t\t\t\t\tres.write(body);\n'+
+                                                                                                                '\t\t\t\t}\n\n'+
+                                                                                                                '\t\t\t\tres.end();\n'+
+                                                                                                                '\t\t});\n'+
+                                                                                        '\t});\n'+
+                                                                                    '}\n'+
+                                                                                    '', function(err) {
+                                                                                        if(err) {
+                                                                                            return console.log(err);
+                                                                                        }
+
+                                                                                        back_to_main("The file was saved!");
+                                                                                    }); 
+
+                                                                    });
+                                                                });
+
+                                                            });
+
+                                                    } else {
+
+                                                        overWrite(__dirname+'/../routes/'+_route['local-name']+'-'+_route['local-method']+'.js', function() {
+                                                            fs.writeFile(__dirname+'/../routes/'+_route['local-name']+'-'+_route['local-method']+'.js', ''+
+                                                                    'const request = require("request");\n\n'+
+                                                                    'module.exports = function(app, config, middlewares) {\n\n'+
+                                                                        '\tapp.'+_route['local-method']+'("/'+_route['local-name']+'", function(req, res) {\n\n'+
+                                                                            '\t\trequest({\n'+
+                                                                                '\t\t\turl: "'+_route.host+'/'+_route.target+'", //URL to hit\n'+
+                                                                                '\t\t\t\tqs: '+_route.data+', //Query string data\n'+
+                                                                                '\t\t\t\tmethod: "'+_route.method+'",\n'+
+                                                                                    '\t\t\t\t//headers: {\n'+
+                                                                                    '\t\t\t\t//    "Content-Type": "MyContentType",\n'+
+                                                                                    '\t\t\t\t//    "Custom-Header": "Custom Value"\n'+
+                                                                                    '\t\t\t\t//},\n'+
+                                                                                    '\t\t\t\tbody: "Hello Hello! String body!" //Set the body as a string\n'+
+                                                                                    '\t\t\t}, function(error, response, body){\n'+
+                                                                                        '\t\t\t\tif(error) {\n'+
+                                                                                            '\t\t\t\t\tconsole.log(error);\n'+
+                                                                                                '\t\t\t\t} else {\n'+
+                                                                                                    '\t\t\t\t\tres.write(body);\n'+
+                                                                                                        '\t\t\t\t}\n\n'+
+                                                                                                        '\t\t\t\tres.end();\n'+
+                                                                                                        '\t\t});\n'+
+                                                                                '\t});\n'+
+                                                                            '}\n'+
+                                                                            '', function(err) {
+                                                                                if(err) {
+                                                                                    return console.log(err);
+                                                                                }
+
+                                                                                back_to_main("The file was saved!");
+                                                                            }); 
+
+                                                        });
+
+
+                                                    }
+
+                                                });
+
                                             });
 
                                             break;
@@ -557,27 +656,27 @@ function main() {
 
                                                 overWrite(__dirname+'/../routes/'+answers['local-name']+'-'+_route.method+'.js', function() {
                                                     fs.writeFile(__dirname+'/../routes/'+answers['local-name']+'-'+_route.method+'.js', ''+
-                                                        'const httpProxy = require("http-proxy");\n'+
-                                                        'const proxy = httpProxy.createProxyServer({});\n\n'+
-                                                        'module.exports = function(app, config, middlewares) {\n\n'+
-                                                        '\tapp.'+_route.method+'("/'+answers['local-name']+'", function(req, res) {\n\n'+
+                                                            'const httpProxy = require("http-proxy");\n'+
+                                                            'const proxy = httpProxy.createProxyServer({});\n\n'+
+                                                            'module.exports = function(app, config, middlewares) {\n\n'+
+                                                                '\tapp.'+_route.method+'("/'+answers['local-name']+'", function(req, res) {\n\n'+
 
-                                                            patch_request+
-                                                            '\t\tproxy.web(req, res, { target: '+target+' }, \n'+
-                                                            '\t\tfunction(err) { if(err) throw err; });\n\n'+
+                                                                    patch_request+
+                                                                        '\t\tproxy.web(req, res, { target: '+target+' }, \n'+
+                                                                                '\t\tfunction(err) { if(err) throw err; });\n\n'+
 
-                                                            '\t});\n\n'+
-                                                            '}\n'+
-                                                            '', function(err) {
-                                                                if(err) {
-                                                                    return console.log(err);
-                                                                }
+                                                                        '\t});\n\n'+
+                                                                    '}\n'+
+                                                                    '', function(err) {
+                                                                        if(err) {
+                                                                            return console.log(err);
+                                                                        }
 
-                                                                back_to_main("The file was saved!");
+                                                                        back_to_main("The file was saved!");
 
-                                                                }); 
+                                                                    }); 
 
-                                                    });
+                                                });
                                             });
                                             break;
 
@@ -589,7 +688,10 @@ function main() {
                             });
                         });
 
+                    });
+
                 });
+
                 break;
 
             case 'Quit':
