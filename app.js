@@ -32,7 +32,7 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //Logs
-const logStream = fs.createWriteStream(__dirname+'/system/'+platform.config.name+'.log');
+const logStream = fs.createWriteStream(__dirname+'/system/inode.log');
 const logger = new Console(logStream,logStream);
 const log = function() {
     logger.log('['+new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')+']',colors.green.apply(true,arguments));

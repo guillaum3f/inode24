@@ -1,5 +1,0 @@
-[2016-10-22 17:22:39] [32mStatic content is served from /home/gefeo/innov24/soups/paar/innov24/static[39m
-[2016-10-22 17:22:39] [32mStarted inode "innov24" at address localhost:8080[39m
-[2016-10-22 17:22:39] [32mSuccess [require middleware "list-inode-routes.js"] [39m
-[2016-10-22 17:22:39] [32mSuccess [require route "routes-get.js"] [39m
-[2016-10-22 17:22:39] [32mLaunching sub-server "one"[39m
