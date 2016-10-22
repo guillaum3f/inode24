@@ -9,6 +9,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var jsonfile = require('jsonfile')
 const exec = require('child_process').exec;
+const os = require('os');
+const dns = require('dns');
+const json = require('format-json');
 
 var platform = {};
 platform.config = require('./config.json');
@@ -24,6 +27,18 @@ var routes_dir = __dirname+'/routes';
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
+
+//Informations on host
+console.log('FREEMEMORY ...'+os.freemem());
+console.log('HOMEDIR ...' + os.homedir());
+console.log('HOSTNAME ...' + os.hostname());
+console.log('NETWORK-INTERFACES ...' + json.plain(os.networkInterfaces()));
+console.log('ARCH ...'+os.arch());
+//console.log('CONSTANT ...'+os.constant());
+console.log('PLATFORM ...'+os.platform()+'#'+os.release());
+console.log('TMPDIR ...'+os.tmpdir());
+console.log('UPTIME ...'+os.uptime());
+console.log('CURRENT DNS ...'+dns.getServers());
 
 //Require user middlewares
 fs.access(middlewares_dir, fs.F_OK, function(err) {
