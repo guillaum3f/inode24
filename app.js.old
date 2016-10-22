@@ -167,7 +167,6 @@ if(platform.config && platform.config['third-part-servers']) {
 }
 
 //Starts sub-servers
-var p_list = [];
 if(platform.config && platform.config.servers) {
     fs.access(servers_dir, fs.F_OK, function(err) {
         if (!err) {
@@ -175,32 +174,37 @@ if(platform.config && platform.config.servers) {
                 var cmd = {};
                 for (var i=0; i<items.length; i++) {
                     if(platform.config.servers[items[i]]) {
-                        (function(i) {
+                        platform.servers.push(servers_dir+'/'+items[i]);
+                        fs.access(servers_dir+'/'+items[i]+'/app.js', fs.F_OK, function(err) {
+                            if (!err) {
+                                var item = platform.servers.shift();
+                                log('Launching sub-server "'+path.basename(item)+'" at '+platform.config.servers[path.basename(item)]);
+                                cmd.install = 'cd '+item+' && npm install';
+                                //cmd.start = 'cd '+item+' && node '+item+'/app.js';
+                                //exec(cmd.install, (err, stdout, stderr) => {
+                                //    if(err) error('Failure [install sub-server '+item,+']"] '+err);
 
-                                var child = exec('cd '+servers_dir+'/'+items[i]+' && node app.js');
-
-                                // Add the child process to the list for tracking
-                                p_list.push({process:child, content:""});
-
-                                // Listen for any response:
-                                child.stdout.on('data', function (data) {
-
-                                    console.log(child.pid, data);
-                                    p_list[i].content += data;
-                                });
-
-                                // Listen for any errors:
-                                child.stderr.on('data', function (data) {
-                                    console.log(child.pid, data);
-                                    p_list[i].content += data;
-                                }); 
-
-                                // Listen if the process closed
-                                child.on('close', function(exit_code) {
-                                    console.log('Closed before stop: Closing code: ', exit_code);
-                                });
-
-                        }(i));
+//spawn('npm', ['install', item+'/app.js'], {
+//        detached: false
+//});
+console.log(item+'/app.js');
+spawn('node', [item+'/app'], {
+        detached: true
+});
+                                    //exec(cmd.start, (err, stdout, stderr) => {
+                                    //    if(err) error('Failure [start sub-server '+item,+']"] '+err);
+                                    //});
+                                    display('Server', function() {
+                                            var address = platform.config.servers[path.basename(item)].split(':')[0];
+                                            var port = platform.config.servers[path.basename(item)].split(':')[1];
+                                            exec('curl -s '+address+':'+port+'/routes', (err, stdout, stderr) => {
+                                                if(err) error('Failure [start sub-server '+item,+']"] '+err);
+                                                console.log(colors.green('Server found : "'+path.basename(item)+'" at '+address+':'+port));
+                                            });
+                                    });
+                                //});
+                            }
+                        });
                     }
                 }
             });

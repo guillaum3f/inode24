@@ -3,7 +3,9 @@
   "owner": "TCA",
   "description": "innov24",
   "port": "8080",
+  "static-content-enabled": true,
   "servers": {
-    "one": "localhost:8081"
+    "one": "localhost:8081",
+    "two": "localhost:8082"
   }
 }
