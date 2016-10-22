@@ -94,7 +94,9 @@ if(platform.config && platform.config.servers) {
                         fs.access(servers_dir+'/'+items[i]+'/app.js', fs.F_OK, function(err) {
                             if (!err) {
                                 var item = platform.servers.shift();
-                                exec('npm install --prefix '+item+' && node '+item+'/app.js', (error, stdout, stderr) => {
+                                var cmd = 'npm install --prefix '+item+' && node '+item+'/app.js&';
+                                exec(cmd, (error, stdout, stderr) => {
+                                console.log('oui');
                                     if(error) console.log(error);
                                 });
                             }

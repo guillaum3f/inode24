@@ -1,15 +1,9 @@
 {
   "name": "innov24",
   "owner": "TCA",
-  "description": "Journalism social workspace",
+  "description": "innov24",
   "port": "8080",
-  "third-part-servers": [
-    "ldapjs-server.js"
-  ],
   "servers": {
-    "auth": "localhost:8081",
-    "apps": "localhost:8082",
-    "tools": "localhost:8083",
-    "process": "localhost:8084"
+    "one": "localhost:8081"
   }
 }
