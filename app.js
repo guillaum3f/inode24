@@ -235,14 +235,16 @@ fs.access(__dirname+'/../../config.json', fs.F_OK, function(err) {
             platform.config.port = _config.servers[platform.config.name].split(':')[1];
             jsonfile.writeFile(__dirname+'/config.json', platform.config, {spaces: 2}, function(err) {
                 if(err) err('Failure [write config]"] '+err);
+
+                app.listen(platform.config.port);  //listen
+                log('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port);
+                display('Inode : '+platform.config.name, function() {
+                    console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
+                },true);
+
             })
         }
     }
 
-    app.listen(platform.config.port);  //listen
-    log('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port);
-    display('Inode : '+platform.config.name, function() {
-        console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
-    },true);
    
 });
