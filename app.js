@@ -66,27 +66,27 @@ const error = function() {
     logger.error('['+new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')+']',colors.red.apply(true,arguments));
 }
 
-//figlet('Host config', 'Standard', function(err, ascii) {
-//    if (err) {
-//        log('Something went wrong...');
-//        error(err);
-//        return;
-//    }
-//
-//    console.log(ascii)
-//
-//    //Informations on host
-//    console.log(colors.white.bold('FREEMEMORY ...'+os.freemem()));
-//    console.log(colors.white.bold('HOMEDIR ...' + os.homedir()));
-//    console.log(colors.white.bold('HOSTNAME ...' + os.hostname()));
-//    console.log(colors.white.bold('NETWORK-INTERFACES ...' + json.plain(os.networkInterfaces())));
-//    console.log(colors.white.bold('ARCH ...'+os.arch()));
-//    //console.log(colors.white.bold('CONSTANTS ...'+ json.plain(os.constants)));
-//    console.log(colors.white.bold('PLATFORM ...'+os.platform()+'#'+os.release()));
-//    console.log(colors.white.bold('TMPDIR ...'+os.tmpdir()));
-//    console.log(colors.white.bold('UPTIME ...'+os.uptime()));
-//    console.log(colors.white.bold('CURRENT DNS ...'+dns.getServers()));
-//});
+figlet('Host config', 'Standard', function(err, ascii) {
+    if (err) {
+        log('Something went wrong...');
+        error(err);
+        return;
+    }
+
+    console.log(ascii)
+
+    //Informations on host
+    console.log(colors.white.bold('FREEMEMORY ...'+os.freemem()));
+    console.log(colors.white.bold('HOMEDIR ...' + os.homedir()));
+    console.log(colors.white.bold('HOSTNAME ...' + os.hostname()));
+    console.log(colors.white.bold('NETWORK-INTERFACES ...' + json.plain(os.networkInterfaces())));
+    console.log(colors.white.bold('ARCH ...'+os.arch()));
+    //console.log(colors.white.bold('CONSTANTS ...'+ json.plain(os.constants)));
+    console.log(colors.white.bold('PLATFORM ...'+os.platform()+'#'+os.release()));
+    console.log(colors.white.bold('TMPDIR ...'+os.tmpdir()));
+    console.log(colors.white.bold('UPTIME ...'+os.uptime()));
+    console.log(colors.white.bold('CURRENT DNS ...'+dns.getServers()));
+});
 
 
 //Require user middlewares
@@ -185,10 +185,7 @@ if(platform.config && platform.config.servers) {
 
                                 // Listen for any response:
                                 child.stdout.on('data', function (data) {
-
-                                    display('', function() {
-                                        console.log(colors.green(data));
-                                    });
+                                    console.log(colors.green(data));
                                     p_list[i].content += data;
                                 });
 

@@ -6,6 +6,7 @@ var path = require('path');
 var inquirer = require('inquirer');
 var child_process = require('child_process');
 var request = require('request');
+var colors = require('colors');
 const exec = require('child_process').exec;
 
 var server = [
@@ -241,7 +242,7 @@ function main() {
 
                             exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
                                 if(err) console.error(err);
-                                console.log('Inode '+resp.name+' has been installed!');
+                                console.log(colors.green('Inode '+resp.name+' has been installed!'));
                             });
 
                     });
