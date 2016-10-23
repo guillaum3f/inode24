@@ -5,7 +5,10 @@
   "port": "8080",
   "static-content-enabled": true,
   "servers": {
-    "one": "localhost:8081",
-    "two": "localhost:8082"
+    "toto": "localhost:8091",
+    "tutu": "localhost:8092",
+    "titi": "localhost:8093",
+    "tata": "localhost:8094",
+    "fuck": "localhost:8095"
   }
 }

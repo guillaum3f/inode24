@@ -47,7 +47,7 @@ var display = function(name,callback, title) {
         if(title) { 
             console.log(ascii)
         } else {
-            console.log('\nNew '+name);
+            console.log(name);
             callback();
         }
     });
@@ -175,8 +175,9 @@ if(platform.config && platform.config.servers) {
                 var cmd = {};
                 for (var i=0; i<items.length; i++) {
                     if(platform.config.servers[items[i]]) {
-                        (function(i) {
+                            (function(i) {
 
+                                //var child = exec('cd '+servers_dir+'/'+items[i]+' && node app.js');
                                 var child = exec('cd '+servers_dir+'/'+items[i]+' && node app.js');
 
                                 // Add the child process to the list for tracking
@@ -185,13 +186,15 @@ if(platform.config && platform.config.servers) {
                                 // Listen for any response:
                                 child.stdout.on('data', function (data) {
 
-                                    console.log(child.pid, data);
+                                    display('', function() {
+                                        console.log(colors.green(data));
+                                    });
                                     p_list[i].content += data;
                                 });
 
                                 // Listen for any errors:
                                 child.stderr.on('data', function (data) {
-                                    console.log(child.pid, data);
+                                    console.log(colors.red(child.pid, data));
                                     p_list[i].content += data;
                                 }); 
 
@@ -200,7 +203,7 @@ if(platform.config && platform.config.servers) {
                                     console.log('Closed before stop: Closing code: ', exit_code);
                                 });
 
-                        }(i));
+                            }(i));
                     }
                 }
             });

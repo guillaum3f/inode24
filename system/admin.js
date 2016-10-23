@@ -239,7 +239,12 @@ function main() {
                                 if(err) console.error(err)
                             })
 
+                            exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
+                                if(err) console.error(err);
+                                console.log('Inode '+resp.name+' has been installed!');
                             });
+
+                    });
 
                 });
 
