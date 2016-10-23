@@ -219,9 +219,12 @@ extfs.isEmpty(static_dir, function (empty) {
             warn("Static content is activated but Static folder is empty. No static content served from "+static_dir);
             console.warn(colors.yellow("Static content is activated but Static folder is empty. No static content served from "+static_dir));
         } else {
-            app.use(express.static(static_dir)); //serve a static app
-            log("Static content is served from "+static_dir);
-            console.log(colors.green("Static content is served from "+static_dir));
+            exec('cd '+static_dir+' && bower install', function(err) {
+                if(err) error('Bower install failed in '+static_dir+' : '+err);
+                app.use(express.static(static_dir)); //serve a static app
+                log("Static content is served from "+static_dir);
+                console.log(colors.green("Static content is served from "+static_dir));
+            })
         }
     });
 
