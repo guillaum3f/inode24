@@ -249,6 +249,8 @@ fs.access(__dirname+'/../../config.json', fs.F_OK, function(err) {
                 if(err) error('Failure [write config]"] '+err);
                 start();
             })
+        } else {
+            start();
         }
     } else {
         start();
