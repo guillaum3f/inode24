@@ -30,6 +30,7 @@ var servers_dir = __dirname+'/servers';
 var third_part_servers_dir = __dirname+'/servers/third-part-servers';
 var static_dir = __dirname+'/static';
 var routes_dir = __dirname+'/routes';
+var use_dir = __dirname+'/use';
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -207,6 +208,26 @@ if(platform.config && platform.config.servers) {
         }
     });
 }
+
+//App.use
+fs.access(use_dir, fs.F_OK, function(err) {
+    if (!err) {
+        fs.readdir(use_dir, function(err, items) {
+            for (var i=0; i<items.length; i++) {
+                if(path.extname(items[i]) === '.js') {
+                    var item = items[i];
+                    routes.push(items[i]);
+                    try {
+                        require(use_dir+'/'+item)(app,platform.config);
+                        log('Success [express use "'+item+'"] ');
+                    } catch (e) {
+                        error('Failure [express can\'t use "'+item+'"] '+e);
+                    }
+                }
+            }
+        });
+    }
+});
 
 //Enable static content
 extfs.isEmpty(static_dir, function (empty) {
