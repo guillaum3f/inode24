@@ -156,8 +156,8 @@ if(platform.config && platform.config['third-part-servers']) {
                             console.log(colors.green("Third-part server found : "+item));
                         });
                         exec('node '+third_part_servers_dir+'/'+items[i], (err, stdout, stderr) => {
-                            if(err) error('Failure [exec third-part server "'+item,+'"] '+err);
-                            console.log(colors.red('Failure [exec third-part server "'+item,+'"] '));
+                            if(err) error('Failure [exec third-part server "'+item+'"] '+err);
+                            console.log(colors.red('Failure [exec third-part server "'+item+'"] '));
                         });
                     }
                 }
