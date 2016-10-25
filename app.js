@@ -89,7 +89,6 @@ figlet('Host config', 'Standard', function(err, ascii) {
     console.log(colors.white.bold('CURRENT DNS ...'+dns.getServers()));
 });
 
-
 //Require user middlewares
 var middlewares = [];
 fs.access(middlewares_dir, fs.F_OK, function(err) {
@@ -156,8 +155,8 @@ if(platform.config && platform.config['third-part-servers']) {
                         display('Third-part servers', function() {
                             console.log(colors.green("Third-part server found : "+item));
                         });
-                        exec('node '+third_part_servers_dir+'/'+items[i], (error, stdout, stderr) => {
-                            if(error) error('Failure [exec third-part server "'+item,+'"] '+error);
+                        exec('node '+third_part_servers_dir+'/'+items[i], (err, stdout, stderr) => {
+                            if(err) error('Failure [exec third-part server "'+item,+'"] '+err);
                             console.log(colors.red('Failure [exec third-part server "'+item,+'"] '));
                         });
                     }
@@ -209,26 +208,6 @@ if(platform.config && platform.config.servers) {
     });
 }
 
-//App.use
-fs.access(use_dir, fs.F_OK, function(err) {
-    if (!err) {
-        fs.readdir(use_dir, function(err, items) {
-            for (var i=0; i<items.length; i++) {
-                if(path.extname(items[i]) === '.js') {
-                    var item = items[i];
-                    routes.push(items[i]);
-                    try {
-                        require(use_dir+'/'+item)(app,platform.config);
-                        log('Success [express use "'+item+'"] ');
-                    } catch (e) {
-                        error('Failure [express can\'t use "'+item+'"] '+e);
-                    }
-                }
-            }
-        });
-    }
-});
-
 //Enable static content
 extfs.isEmpty(static_dir, function (empty) {
 
@@ -242,9 +221,11 @@ extfs.isEmpty(static_dir, function (empty) {
         } else {
             exec('cd '+static_dir+' && bower install', function(err) {
                 if(err) error('Bower install failed in '+static_dir+' : '+err);
-                app.use(express.static(static_dir)); //serve a static app
-                log("Static content is served from "+static_dir);
-                console.log(colors.green("Static content is served from "+static_dir));
+                setTimeout(function() {
+                    app.use(express.static(static_dir)); //serve a static app
+                    log("Static content is served from "+static_dir);
+                    console.log(colors.green("Static content is served from "+static_dir));
+                },5000);
             })
         }
     });
