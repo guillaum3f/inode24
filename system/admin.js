@@ -9,6 +9,8 @@ var request = require('request');
 var colors = require('colors');
 const exec = require('child_process').exec;
 
+var finish_process = '';
+
 var server = [
 {
     type: 'input',
@@ -53,14 +55,6 @@ var server = [
             return true;
         }
     }
-},
-{
-    type: 'input',
-    name: 'config',
-    message: 'Global config file to use?*',
-    validate: function(str){
-        return !!str;
-    }
 }
 ];
 
@@ -94,14 +88,6 @@ var third_part_server = [
     name: 'licence',
     message: 'Licence?',
     default: 'none',
-    validate: function(str){
-        return !!str;
-    }
-},
-{
-    type: 'input',
-    name: 'config',
-    message: 'Global config file to use with?*',
     validate: function(str){
         return !!str;
     }
@@ -215,7 +201,12 @@ function main() {
 
                 inquirer.prompt(server).then(function(resp) {
 
-                    var config = require(__dirname+'/'+resp.config);
+                    var config = {};
+                    var config_file = '../config.json';
+
+                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                        config = require(__dirname+'/'+config_file);
+                    } 
 
                     if(!config.servers) {
                         config.servers = {};
@@ -223,28 +214,36 @@ function main() {
 
                     config.servers[resp.name] = resp.host;
 
-                    var file = __dirname+'/'+resp.config;
-                    jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
-                        if(err) console.error(err)
-                    })
+                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                        var file = __dirname+'/'+config_file;
+                        jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
+                            if(err) console.error(err)
+                                finish_process();
+                        });
+                    } else {
+                        finish_process();
+                    }
 
-                    exec('git clone https://github.com/guillaum3f/inode24.git '+__dirname+'/../servers/'+resp.name, (error, stdout, stderr) => {
-                            if(error) console.log(error);
-                            var _config = {};
-                            _config.name = resp.name;
-                            _config.owner = resp.owner;
-                            _config.description = resp.description;
-                            _config.licence = resp.licence || 'none';
-                            _config.port = resp.host.split(':')[1];
-                            jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
-                                if(err) console.error(err);
-                                exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
-                                    if(err) console.error(err);
-                                    console.log(colors.green('Inode '+resp.name+' has been installed!'));
+                    finish_process = function() {
+                        exec('git clone https://github.com/guillaum3f/inode24.git '+__dirname+'/../servers/'+resp.name,
+                                (error, stdout, stderr) => {
+                                    if(error) console.log(error);
+                                    var _config = {};
+                                    _config.name = resp.name;
+                                    _config.owner = resp.owner;
+                                    _config.description = resp.description;
+                                    _config.licence = resp.licence || 'none';
+                                    _config.port = resp.host.split(':')[1];
+                                    jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
+                                        if(err) console.error(err);
+                                        exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
+                                            if(err) console.error(err);
+                                            console.log(colors.green('Inode '+resp.name+' has been installed!'));
+                                        });
+                                    });
                                 });
-                            })
+                    }
 
-                    });
 
                 });
 
@@ -258,7 +257,12 @@ function main() {
 
                 inquirer.prompt(third_part_server).then(function(resp) {
 
-                    var config = require(__dirname+'/'+resp.config);
+                    var config = {};
+                    var config_file = '../config.json';
+
+                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                        config = require(__dirname+'/'+config_file);
+                    } 
 
                     if(!config['third-part-servers']) {
                         config['third-part-servers'] = [];
@@ -266,16 +270,29 @@ function main() {
 
                     config['third-part-servers'].push(resp.name+'.js');
 
-                    var file = __dirname+'/'+resp.config;
-                    jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
-                        if(err) console.error(err)
-                    })
+                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                        var file = __dirname+'/'+config_file;
+                        jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
+                            if(err) console.error(err)
+                                finish_process();
+                        })
+                    } else {
+                        finish_process();
+                    }
 
-                    exec('echo "/*Name : '+resp.name+'\ndescription : '+resp.description+'\nLicence : '+resp.licence +'*/\n" > '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js', (error, stdout, stderr) => {
+                    finish_process = function() {
+                        exec('echo "/*Name : '+
+                                resp.name+'\ndescription : '+
+                                resp.description+'\nLicence : '+
+                                resp.licence +'*/\n" > '+
+                                __dirname+'/../servers/third-part-servers/'+
+                                resp.name+'.js', (error, stdout, stderr) => {
 
-                        console.log('Execute '+resp.editor+' '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js'); 
+                                    console.log('Execute '+resp.editor+' '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js'); 
 
-                    });
+                                });
+
+                    }
 
                 });
 

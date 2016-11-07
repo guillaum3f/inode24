@@ -3,5 +3,8 @@
   "owner": "TCA",
   "description": "Social Workspace",
   "port": "80",
-  "static-content-enabled": false
+  "static-content-enabled": false,
+  "servers": {
+    "Application-Server": "localhost:9090"
+  }
 }
