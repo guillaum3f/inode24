@@ -237,13 +237,12 @@ function main() {
                             _config.licence = resp.licence || 'none';
                             _config.port = resp.host.split(':')[1];
                             jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
-                                if(err) console.error(err)
-                            })
-
-                            exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
                                 if(err) console.error(err);
-                                console.log(colors.green('Inode '+resp.name+' has been installed!'));
-                            });
+                                exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
+                                    if(err) console.error(err);
+                                    console.log(colors.green('Inode '+resp.name+' has been installed!'));
+                                });
+                            })
 
                     });
 
