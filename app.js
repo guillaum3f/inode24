@@ -47,12 +47,13 @@ var display = function(name,callback, title) {
         }
 
         if(title && DISPLAY_FLAG !== false) { 
-            console.log(ascii)
-            if(callback) callback();
-        } else {
-            console.log(name);
-            if(callback) callback();
+            name = ascii;
         }
+
+        setTimeout(function() {
+            if(name) console.log(name)
+            if(callback) callback();
+        },500);
 
     });
 }
@@ -106,9 +107,6 @@ fs.access(middlewares_dir, fs.F_OK, function(err) {
                     try {
                         platform.middlewares[path.basename(item,'.js')] = require(middlewares_dir+'/'+item);
                         log('Success [require middleware "'+item+'"] ');
-                        display('Middleware', function() {
-                            console.log(colors.green("Middleware found : "+middlewares.shift()));
-                        });
                     } catch (e) {
                         error('Failure [require middleware "'+item+'"] '+e);
                         display('Middleware', function() {
@@ -133,9 +131,6 @@ fs.access(routes_dir, fs.F_OK, function(err) {
                     try {
                         require(routes_dir+'/'+item)(app,platform.config,platform.middlewares);
                         log('Success [require route "'+item+'"] ');
-                        display('Route', function() {
-                            console.log(colors.green("Route found : "+routes.shift()));
-                        });
                     } catch (e) {
                         error('Failure [require route "'+item+'"] '+e);
                         display('Route', function() {
@@ -157,12 +152,11 @@ if(platform.config && platform.config['third-part-servers']) {
                     var item = items[i];
                     if(platform.config['third-part-servers'].indexOf(item) > -1){
                         log('Launching third-part server "'+item+'" (unknown port, look in "'+third_part_servers_dir+'/'+item+'")');
-                        display('Third-part servers', function() {
-                            console.log(colors.green("Third-part server found : "+item));
-                        });
                         exec('node '+third_part_servers_dir+'/'+items[i], (err, stdout, stderr) => {
-                            if(err) error('Failure [exec third-part server "'+item+'"] '+err);
-                            console.log(colors.red('Failure [exec third-part server "'+item+'"] '));
+                            if(err) {
+                                error('Failure [exec third-part server "'+item+'"] '+err);
+                                console.log(colors.red('Failure [exec third-part server "'+item+'"] '));
+                            }
                         });
                     }
                 }
@@ -190,9 +184,7 @@ if(platform.config && platform.config.servers) {
 
                                 // Listen for any response:
                                 child.stdout.on('data', function (data) {
-                                    setTimeout(function() {
-                                        console.log(colors.green(data));
-                                    });
+                                    console.log(colors.green(data));
                                     p_list[i].content += data;
                                 });
 
@@ -218,7 +210,7 @@ if(platform.config && platform.config.servers) {
 //Enable static content
 extfs.isEmpty(static_dir, function (empty) {
 
-    display('Static Content', function() {
+    display(null, function() {
         if (!platform.config['static-content-enabled']){
             log("Static content is deactivated. No static content served");
             console.log(colors.green("Static content is deactivated. No static content served"));
@@ -241,9 +233,7 @@ function start() {
     app.listen(platform.config.port);  //listen
     log('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port);
     display('Inode : '+platform.config.name, function() {
-        setTimeout(function() {
-            console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
-        });
+        console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
     },true);
 
 }
