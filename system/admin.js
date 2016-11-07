@@ -446,7 +446,7 @@ function main() {
 
                         _route.host = 'http://'+answers.host+':'+answers.port;
 
-                        request.get(_route.host+'/routes', function(error, response, body) {
+                        request.get(_route.host+'/_routes', function(error, response, body) {
                             if(error) throw error;
                             inquirer.prompt([{
                                 type: 'list',

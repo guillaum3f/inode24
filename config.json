@@ -1,14 +1,27 @@
 {
   "name": "innov24",
   "owner": "TCA",
-  "description": "innov24",
-  "port": "8080",
-  "static-content-enabled": true,
+  "description": "A social workspace for journalism",
+  "port": "80",
+  "static-content-enabled": false,
   "servers": {
-    "toto": "localhost:8092",
-    "tutu": "localhost:8093",
-    "titi": "localhost:8093",
-    "tata": "localhost:8091",
-    "fuck": "localhost:8095"
+    "Auth": "localhost:8080",
+    "Apps": "localhost:8081",
+    "Tools": "localhost:8082"
+  },
+  "global": {
+    "TLD": "io",
+    "domain": "innov24",
+    "roles": {
+      "role1": "journalist",
+      "role2": "communicator",
+      "role3": "leader"
+    },
+    "cookie": {
+      "auth": {
+        "cookieName": "session",
+        "secret": "blargadeeblargblarg"
+      }
+    }
   }
 }
