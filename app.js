@@ -47,10 +47,12 @@ var display = function(name,callback, title) {
 
         if(title) { 
             console.log(ascii)
+            if(callback) callback();
         } else {
             console.log(name);
-            callback();
+            if(callback) callback();
         }
+
     });
 }
 
@@ -185,7 +187,9 @@ if(platform.config && platform.config.servers) {
 
                                 // Listen for any response:
                                 child.stdout.on('data', function (data) {
-                                    console.log(colors.green(data));
+                                    setTimeout(function() {
+                                        console.log(colors.green(data));
+                                    });
                                     p_list[i].content += data;
                                 });
 
@@ -234,7 +238,9 @@ function start() {
     app.listen(platform.config.port);  //listen
     log('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port);
     display('Inode : '+platform.config.name, function() {
-        console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
+        setTimeout(function() {
+            console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
+        });
     },true);
 
 }
