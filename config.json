@@ -1,27 +1,7 @@
 {
   "name": "innov24",
   "owner": "TCA",
-  "description": "A social workspace for journalism",
+  "description": "Social Workspace",
   "port": "80",
-  "static-content-enabled": false,
-  "servers": {
-    "Auth": "localhost:8080",
-    "Apps": "localhost:8081",
-    "Tools": "localhost:8082"
-  },
-  "global": {
-    "TLD": "io",
-    "domain": "innov24",
-    "roles": {
-      "role1": "journalist",
-      "role2": "communicator",
-      "role3": "leader"
-    },
-    "cookie": {
-      "auth": {
-        "cookieName": "session",
-        "secret": "blargadeeblargblarg"
-      }
-    }
-  }
+  "static-content-enabled": false
 }
