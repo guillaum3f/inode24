@@ -5,6 +5,11 @@
   "port": "80",
   "static-content-enabled": false,
   "servers": {
-    "Application-Server": "localhost:9090"
+    "Application-Server": "localhost:9090",
+    "toto": "localhost:9898",
+    "tutu": "localhost:9797",
+    "tg": "localhost:8989",
+    "poi": "localhost:9595",
+    "tete": "localhost:9696"
   }
 }

@@ -8,6 +8,8 @@ var child_process = require('child_process');
 var request = require('request');
 var colors = require('colors');
 const exec = require('child_process').exec;
+const validUrl = require('valid-url');
+const promptSync = require('readline-sync').question;
 
 var finish_process = '';
 
@@ -52,6 +54,16 @@ var server = [
     message: 'Host and Port Number?* [i.e localhost:8763] ',
     validate: function(str){
         if(str.split(':').length === 2) {
+            return true;
+        }
+    }
+},
+{
+    type: 'input',
+    name: 'static',
+    message: 'Enable static content?* [true|false]',
+    validate: function(str){
+        if (str === 'true' || str === 'false') {
             return true;
         }
     }
@@ -201,10 +213,19 @@ function main() {
 
                 inquirer.prompt(server).then(function(resp) {
 
+                    if(resp.static === 'true') {
+                        while (!resp['static-app-url']){
+                            resp['static-app-url'] = promptSync('?'.green+' Static app Github url: '.bold.white);
+                        }
+                        if (!validUrl.isUri(resp['static-app-url'])){
+                            resp['static-app-url'] = null;
+                        }
+                    }
+
                     var config = {};
                     var config_file = '../config.json';
 
-                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                    if (fs.existsSync(__dirname+'/'+config_file)) { 
                         config = require(__dirname+'/'+config_file);
                     } 
 
@@ -214,7 +235,7 @@ function main() {
 
                     config.servers[resp.name] = resp.host;
 
-                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                    if (fs.existsSync(__dirname+'/'+config_file)) { 
                         var file = __dirname+'/'+config_file;
                         jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
                             if(err) console.error(err)
@@ -224,24 +245,60 @@ function main() {
                         finish_process();
                     }
 
+                    var _config = {};
                     finish_process = function() {
                         exec('git clone https://github.com/guillaum3f/inode24.git '+__dirname+'/../servers/'+resp.name,
                                 (error, stdout, stderr) => {
                                     if(error) console.log(error);
-                                    var _config = {};
                                     _config.name = resp.name;
                                     _config.owner = resp.owner;
                                     _config.description = resp.description;
                                     _config.licence = resp.licence || 'none';
                                     _config.port = resp.host.split(':')[1];
-                                    jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
-                                        if(err) console.error(err);
-                                        exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
-                                            if(err) console.error(err);
-                                            console.log(colors.green('Inode '+resp.name+' has been installed!'));
-                                        });
-                                    });
+                                    _config['static-content-enabled'] = resp.static;
+
+                                    if(_config['static-content-enabled'] === 'true') {
+                                        _config['static-root'] = path.normalize(__dirname+'/../servers/'+resp.name+'/static');
+                                        _config['static-entry-point'] = 'index.html';
+                                    } 
+                                    if(resp['static-app-url']) {
+                                        _config['static-origin'] = resp['static-app-url'];
+                                        exec('git clone '+_config["static-origin"]+' '+_config["static-root"], (error, stdout, stderr) => {
+                                                    if(error) throw(error);
+                                                    var fflag=0;
+                                                    var finder = require('findit')(_config['static-root']);
+                                                    finder.on('file', function (file) {
+                                                        if(path.basename(file) === _config['static-entry-point'] && fflag === 0) {
+                                                            fflag=1;
+                                                            _config['static-root'] = path.dirname(file);
+                                                        } else if (path.basename(file) === 'bower.json') {
+                                                            exec('cd '+path.dirname(file)+' && bower install', (error, stdout, stderr) => {
+                                                                if(error) throw error;
+                                                            });
+                                                        }
+                                                    });
+                                                    finder.on('error', function (error) {
+                                                        if(error) throw(error);
+                                                    });
+                                                    finder.on('end', function () {
+                                                        finalize_process();
+                                                    });
+                                                });
+                                    } else {
+                                        finalize_process();
+                                    }
+
                                 });
+                    }
+
+                    finalize_process = function() {
+                        jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
+                            if(err) console.error(err);
+                            exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
+                                if(err) console.error(err);
+                                console.log(colors.green('Inode '+resp.name+' has been installed!'));
+                            });
+                        });
                     }
 
 
@@ -260,7 +317,7 @@ function main() {
                     var config = {};
                     var config_file = '../config.json';
 
-                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                    if (fs.existsSync(__dirname+'/'+config_file)) { 
                         config = require(__dirname+'/'+config_file);
                     } 
 
@@ -270,7 +327,7 @@ function main() {
 
                     config['third-part-servers'].push(resp.name+'.js');
 
-                    if (path.existsSync(__dirname+'/'+config_file)) { 
+                    if (fs.existsSync(__dirname+'/'+config_file)) { 
                         var file = __dirname+'/'+config_file;
                         jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
                             if(err) console.error(err)
