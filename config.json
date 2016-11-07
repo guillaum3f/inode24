@@ -1,7 +1,9 @@
 {
-  "name": "innov24",
-  "owner": "TCA",
-  "description": "Social Workspace",
-  "port": "80",
-  "static-content-enabled": false
+  "name": "bubu",
+  "owner": "refert",
+  "description": "ertert",
+  "port": "9696",
+  "static-content-enabled": true,
+  "static-root": "/home/gefeo/0_START/paar2/bubu/static/app",
+  "static-entry-point": "index.html"
 }

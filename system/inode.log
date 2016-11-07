@@ -1,8 +1,2 @@
-[2016-11-03 16:29:40] [32mStarted inode "innov24" at address localhost:80[39m
-[2016-11-03 16:29:40] [32mSuccess [require middleware "get-inode-data.js"] [39m
-[2016-11-03 16:29:40] [32mSuccess [require middleware "list-inode-routes.js"] [39m
-[2016-11-03 16:29:40] [32mSuccess [require route "_inode-get.js"] [39m
-[2016-11-03 16:29:40] [32mSuccess [require route "_routes-get.js"] [39m
-[2016-11-03 16:29:40] [32mSuccess [require route "hello-tca-get.js"] [39m
-[2016-11-03 16:29:40] [32mSuccess [require route "index-get.js"] [39m
-[2016-11-03 16:29:40] [32mStatic content is deactivated. No static content served[39m
+[2016-11-07 16:03:48] [32mStarted inode "bubu" at address localhost:9696[39m
+[2016-11-07 16:03:48] [32mStatic content is served from /home/gefeo/0_START/paar2/bubu/static/app[39m
