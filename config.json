@@ -6,7 +6,7 @@
   "static-content-enabled": false,
   "servers": {
     "Application-Server": "localhost:9090",
-    "toto": "localhost:9898",
+    "toto": "localhost:9090",
     "tutu": "localhost:9797",
     "tg": "localhost:8989",
     "poi": "localhost:9595",
