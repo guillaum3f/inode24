@@ -167,7 +167,6 @@ if(platform.config && platform.config['third-part-servers']) {
 }
 
 //Starts sub-servers
-var p_list = [];
 if(platform.config && platform.config.servers) {
     fs.access(servers_dir, fs.F_OK, function(err) {
         if (!err) {
@@ -175,14 +174,19 @@ if(platform.config && platform.config.servers) {
                 var cmd = {};
                 for (var i=0; i<items.length; i++) {
                     if(platform.config.servers[items[i]]) {
-                            (function(i) {
-
-                                display(colors.yellow('Started inode "'+items[i]+'" at address '+platform.config.servers[items[i]]));
-                            }(i));
+                        var item = items[i];
+                        exec('node '+servers_dir+'/'+item+'/app.js '+false, (err, stdout, stderr) => {
+                            if(err) throw(err);
+                        });
+                        setTimeout(function() {
+                            display(colors.yellow('Started inode "'+item+'" at address '+platform.config.servers[item]));
+                        },500);
                     }
                 }
 
             });
+        } else {
+            throw(err);
         }
     });
 }
@@ -191,9 +195,9 @@ if(platform.config && platform.config.servers) {
 extfs.isEmpty(static_dir, function (empty) {
 
     if(platform.config['static-content-enabled'] === 'true') {
-        platform.config['static-content-enabled'] === true;
+        platform.config['static-content-enabled'] = true;
     } else {
-        platform.config['static-content-enabled'] === false;
+        platform.config['static-content-enabled'] = false;
     }
 
     if (!platform.config['static-content-enabled']){

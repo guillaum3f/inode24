@@ -1,10 +1,11 @@
 {
   "name": "innov24",
-  "owner": "TCA",
-  "description": "Social Workspace",
-  "port": "80",
-  "static-content-enabled": false,
+  "owner": "bla",
+  "description": "bla",
+  "licence": "bla",
+  "port": "9999",
+  "static-content-enabled": "false",
   "servers": {
-    "toto": "localhost:9997"
+    "appserv": "localhost:9998"
   }
 }
