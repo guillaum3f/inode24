@@ -18,6 +18,7 @@ const colors = require('colors')
 const figlet = require('figlet');
 const extfs = require('extfs');
 const request = require('request');
+const concat = require('concat-stream');
 
 var platform = {};
 platform.config = require('./config.json');
@@ -50,10 +51,10 @@ var display = function(name,callback, title) {
             name = ascii;
         }
 
-        setTimeout(function() {
+        //setTimeout(function() {
             if(name) console.log(name)
             if(callback) callback();
-        },500);
+        //});
 
     });
 }
@@ -176,32 +177,11 @@ if(platform.config && platform.config.servers) {
                     if(platform.config.servers[items[i]]) {
                             (function(i) {
 
-                                //var child = exec('cd '+servers_dir+'/'+items[i]+' && node app.js');
-                                var child = exec('cd '+servers_dir+'/'+items[i]+' && node app.js ' + false);
-
-                                // Add the child process to the list for tracking
-                                p_list.push({process:child, content:""});
-
-                                // Listen for any response:
-                                child.stdout.on('data', function (data) {
-                                    console.log(colors.green(data));
-                                    p_list[i].content += data;
-                                });
-
-                                // Listen for any errors:
-                                child.stderr.on('data', function (data) {
-                                    console.log(colors.red(child.pid, data));
-                                    p_list[i].content += data;
-                                }); 
-
-                                // Listen if the process closed
-                                child.on('close', function(exit_code) {
-                                    console.log('Closed before stop: Closing code: ', exit_code);
-                                });
-
+                                display(colors.yellow('Started inode "'+items[i]+'" at address '+platform.config.servers[items[i]]));
                             }(i));
                     }
                 }
+
             });
         }
     });
@@ -210,21 +190,31 @@ if(platform.config && platform.config.servers) {
 //Enable static content
 extfs.isEmpty(static_dir, function (empty) {
 
-    display(null, function() {
-        if (!platform.config['static-content-enabled']){
-            log("Static content is deactivated. No static content served");
+    if(platform.config['static-content-enabled'] === 'true') {
+        platform.config['static-content-enabled'] === true;
+    } else {
+        platform.config['static-content-enabled'] === false;
+    }
+
+    if (!platform.config['static-content-enabled']){
+        log("Static content is deactivated. No static content served");
+        display(null, function() {
             console.log(colors.green("Static content is deactivated. No static content served"));
-        } else if(empty && platform.config['static-content-enabled']) {
-            warn("Static content is activated but Static folder is empty. No static content served from "+static_dir);
+        });
+    } else if(empty && !!platform.config['static-content-enabled']) {
+        warn("Static content is activated but Static folder is empty. No static content served from "+static_dir);
+        display(null, function() {
             console.warn(colors.yellow("Static content is activated but Static folder is empty. No static content served from "+static_dir));
-        } else {
-            app.use(express.static(platform.config['static-root'], {
-                index: platform.config['static-entry-point']
-            })); //serve a static app
-            log("Static content is served from "+platform.config['static-root']);
+        });
+    } else {
+        app.use(express.static(platform.config['static-root'], {
+            index: platform.config['static-entry-point']
+        })); //serve a static app
+        log("Static content is served from "+platform.config['static-root']);
+        display(null, function() {
             console.log(colors.green("Static content is served from "+platform.config['static-root']));
-        }
-    });
+        });
+    }
 
 });
 
