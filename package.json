@@ -37,6 +37,7 @@
     "passport-http": "^0.3.0",
     "passport-ldapauth": "^0.6.0",
     "passport-local": "^1.0.0",
+    "portscanner": "^1.0.0",
     "prompt-sync": "^4.1.4",
     "querystring": "^0.2.0",
     "recursive-readdir": "^2.1.0",
