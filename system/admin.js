@@ -192,6 +192,8 @@ function overWrite(item, callback) {
     });
 }
 
+var target_dir = __dirname;
+
 function main() {
     inquirer.prompt([{
         type: 'list',
@@ -222,32 +224,8 @@ function main() {
                         }
                     }
 
-                    var config = {};
-                    var config_file = '../config.json';
-
-                    if (fs.existsSync(__dirname+'/'+config_file)) { 
-                        config = require(__dirname+'/'+config_file);
-                    } 
-
-                    if(!config.servers) {
-                        config.servers = {};
-                    }
-
-                    config.servers[resp.name] = resp.host;
-
-                    if (fs.existsSync(__dirname+'/'+config_file)) { 
-                        var file = __dirname+'/'+config_file;
-                        jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
-                            if(err) console.error(err)
-                                finish_process();
-                        });
-                    } else {
-                        finish_process();
-                    }
-
-                    var _config = {};
                     finish_process = function() {
-                        exec('git clone https://github.com/guillaum3f/inode24.git '+__dirname+'/../servers/'+resp.name,
+                        exec('git clone https://github.com/guillaum3f/inode24.git '+target_dir+'/servers/'+resp.name,
                                 (error, stdout, stderr) => {
                                     if(error) console.log(error);
                                     _config.name = resp.name;
@@ -258,7 +236,7 @@ function main() {
                                     _config['static-content-enabled'] = resp.static;
 
                                     if(_config['static-content-enabled'] === 'true') {
-                                        _config['static-root'] = path.normalize(__dirname+'/../servers/'+resp.name+'/static');
+                                        _config['static-root'] = path.normalize(target_dir+'/servers/'+resp.name+'/static');
                                         _config['static-entry-point'] = 'index.html';
                                     } 
                                     if(resp['static-app-url']) {
@@ -292,13 +270,38 @@ function main() {
                     }
 
                     finalize_process = function() {
-                        jsonfile.writeFile(__dirname+'/../servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
+                        jsonfile.writeFile(target_dir+'/servers/'+resp.name+'/config.json', _config, {spaces: 2}, function(err) {
                             if(err) console.error(err);
-                            exec('cd '+__dirname+'/../servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
+                            exec('cd '+target_dir+'/servers/'+resp.name+' && npm install', (err, stdout, stderr) => {
                                 if(err) console.error(err);
                                 console.log(colors.green('Inode '+resp.name+' has been installed!'));
                             });
                         });
+                    }
+
+                    var config = {};
+                    var _config = {};
+                    var config_file = '../config.json';
+
+                    if (fs.existsSync(__dirname+'/'+config_file)) { 
+                        config = require(__dirname+'/'+config_file);
+                        target_dir = target_dir+'/..';
+                    } 
+
+                    if(!config.servers) {
+                        config.servers = {};
+                    }
+
+                    config.servers[resp.name] = resp.host;
+
+                    if (fs.existsSync(__dirname+'/'+config_file)) { 
+                        var file = __dirname+'/'+config_file;
+                        jsonfile.writeFile(file, config, {spaces: 2}, function(err) {
+                            if(err) console.error(err)
+                                finish_process();
+                        });
+                    } else {
+                        finish_process();
                     }
 
 
@@ -308,17 +311,32 @@ function main() {
 
             case 'Add a third-part-server':
 
-                mkdirp(__dirname+'/../servers/third-part-servers', function(err) { 
+                mkdirp(target_dir+'/servers/third-part-servers', function(err) { 
                     if (err) throw err;
                 });
 
                 inquirer.prompt(third_part_server).then(function(resp) {
+
+                    finish_process = function() {
+                        exec('echo "/*Name : '+
+                                resp.name+'\ndescription : '+
+                                resp.description+'\nLicence : '+
+                                resp.licence +'*/\n" > '+
+                                target_dir+'/servers/third-part-servers/'+
+                                resp.name+'.js', (error, stdout, stderr) => {
+
+                                    console.log('Execute '+resp.editor+' '+target_dir+'/servers/third-part-servers/'+resp.name+'.js'); 
+
+                                });
+
+                    }
 
                     var config = {};
                     var config_file = '../config.json';
 
                     if (fs.existsSync(__dirname+'/'+config_file)) { 
                         config = require(__dirname+'/'+config_file);
+                        target_dir = target_dir+'/..';
                     } 
 
                     if(!config['third-part-servers']) {
@@ -335,20 +353,6 @@ function main() {
                         })
                     } else {
                         finish_process();
-                    }
-
-                    finish_process = function() {
-                        exec('echo "/*Name : '+
-                                resp.name+'\ndescription : '+
-                                resp.description+'\nLicence : '+
-                                resp.licence +'*/\n" > '+
-                                __dirname+'/../servers/third-part-servers/'+
-                                resp.name+'.js', (error, stdout, stderr) => {
-
-                                    console.log('Execute '+resp.editor+' '+__dirname+'/../servers/third-part-servers/'+resp.name+'.js'); 
-
-                                });
-
                     }
 
                 });
