@@ -191,64 +191,67 @@ if(platform.config && platform.config.servers) {
     });
 }
 
-//Enable static content
-extfs.isEmpty(static_dir, function (empty) {
-
-    if(platform.config['static-content-enabled'] === 'true') {
-        platform.config['static-content-enabled'] = true;
-    } else {
-        platform.config['static-content-enabled'] = false;
-    }
-
-    if (!platform.config['static-content-enabled']){
-        log("Static content is deactivated. No static content served");
-    } else if(empty && !!platform.config['static-content-enabled']) {
-        warn("Static content is activated but Static folder is empty. No static content served from "+static_dir);
-    } else {
-        app.use(express.static(platform.config['static-root'], {
-            index: platform.config['static-entry-point']
-        })); //serve a static app
-        log("Static content is served from "+platform.config['static-root']);
-    }
-
-});
-
-//Start the server
+var static_enabled;
+var msg = '';
+var add_msg = function(txt) {
+    msg += '\n'+txt;
+};
 function start() {
+    //Start the server
     app.listen(platform.config.port);  //listen
     log('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port);
-    display('Inode found : '+platform.config.name, function() {
-        console.log(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
-        display(null, function() {
-            if (!platform.config['static-content-enabled']){
-                console.log(colors.green("Static content is deactivated. No static content served"));
-            } else if(empty && !!platform.config['static-content-enabled']) {
-                console.warn(colors.yellow("Static content is activated but Static folder is empty. No static content served from "+static_dir));
-            } else {
-                console.log(colors.green("Static content is served from "+platform.config['static-root']));
-            }
-            display(null, function() {
-                console.log('        **************        '.rainbow);
-            });
-        });
-    });
+    console.log(msg);
 }
 
-fs.access(__dirname+'/../../config.json', fs.F_OK, function(err) {
-    if (!err) {
-        var _config = require(__dirname+'/../../config.json');
-        if(_config.servers && _config.servers[platform.config.name]) {
-            platform.config.port = _config.servers[platform.config.name].split(':')[1];
-            jsonfile.writeFile(__dirname+'/config.json', platform.config, {spaces: 2}, function(err) {
-                if(err) error('Failure [write config]"] '+err);
-                start();
-            })
-        } else {
-            start();
-        }
-    } else {
-        start();
-    }
+//Enable static content
+extfs.isEmpty(static_dir, function (empty) {
+    display(null, function() {
+        add_msg('Inode found : '+platform.config.name);
+        add_msg(colors.green('Started inode "'+platform.config.name+'" at address localhost:'+ platform.config.port));
+        display(null, function() {
+            if(platform.config['static-content-enabled'] === 'true') {
+                static_enabled = true;
+            } else {
+                static_enabled = false;
+            }
 
-   
+            if (!static_enabled){
+                log("Static content is deactivated. No static content served");
+                add_msg(colors.green("Static content is deactivated. No static content served"));
+            } else if(empty && static_enabled) {
+                warn("Static content is activated but Static folder is empty. No static content served from "+static_dir);
+                add_msg(colors.yellow("Static content is activated but Static folder is empty. No static content served from "+static_dir));
+            } else {
+                app.use(express.static(path.resolve(__dirname,platform.config['static-root']), {
+                    index: platform.config['static-entry-point']
+                })); //serve a static app
+                log("Static content is served from "+platform.config['static-root']);
+                add_msg(colors.green("Static content is served from "+platform.config['static-root']));
+            }
+
+            //display(null, function() {
+                //console.log('        **************        '.rainbow);
+
+                fs.access(__dirname+'/../../config.json', fs.F_OK, function(err) {
+                    if (!err) {
+                        var _config = require(__dirname+'/../../config.json');
+                        if(_config.servers && _config.servers[platform.config.name]) {
+                            platform.config.port = _config.servers[platform.config.name].split(':')[1];
+                            jsonfile.writeFile(__dirname+'/config.json', platform.config, {spaces: 2}, function(err) {
+                                if(err) error('Failure [write config]"] '+err);
+                                start();
+                            })
+                        } else {
+                            start();
+                        }
+                    } else {
+                        start();
+                    }
+
+
+                });
+
+            //});
+        });
+    });
 });
